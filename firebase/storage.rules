@@ -1,0 +1,9 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Postcard photos uploaded from create page.
+    match /postcard-images/{studentId}/{allPaths=**} {
+      allow read, write: if true;
+    }
+  }
+}

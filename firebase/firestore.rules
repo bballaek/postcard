@@ -1,0 +1,9 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // School postcard lookup by student ID (open for this event app).
+    match /postcards/{studentId} {
+      allow read, write: if true;
+    }
+  }
+}

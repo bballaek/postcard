@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Postcard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&family=Great+Vibes&family=Homemade+Apple&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=Playpen+Sans+Thai:wght@400;500;600;700&family=Rye&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/thai-font.css">
+<script src="/assets/page-theme.js"></script>
+<style id="postcard-card">
+@import url('https://fonts.googleapis.com/css2?family=Cabin+Sketch&family=Great+Vibes&family=Rye&display=swap');
+
+/* Postcard card — shared layout (826×572 design canvas) */
+
+.postcard-card{
+  position:relative;
+  width:826px;
+  height:572px;
+  flex:0 0 auto;
+  overflow:hidden;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+.postcard-card img{
+  display:block;
+  pointer-events:none;
+}
+
+/* Photo slot — 762×508 @ (32, 32) */
+
+.pc-photo{
+  position:absolute;
+  left:32px;
+  top:32px;
+  width:762px;
+  height:508px;
+  border-radius:12px;
+  overflow:hidden;
+  z-index:3;
+}
+
+.pc-photo img,
+.pc-photo canvas{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.pc-photo--empty{
+  background:#d4d4d4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.pc-upload-cta{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  opacity:.4;
+}
+
+.pc-upload-cta img{width:44px;height:44px;}
+
+.pc-upload-cta span{
+  font-family:Inter,system-ui,sans-serif;
+  font-weight:500;
+  font-size:18px;
+  line-height:18px;
+  color:#000;
+}
+
+/* Generic gray placeholder slot */
+
+.pc-slot-gray{
+  background:#d4d4d4;
+}
+
+/* Frame overlay — border ring under content */
+
+.pc-frame{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* Title hint — per line */
+
+.pc-line-hint{opacity:.3;}
+
+/* ===== Modern — Front ===== */
+
+.postcard-card--modern.postcard-card--front .pc-front-title,
+.postcard-card--modern.postcard-card--front .pc-front-title .pc-underline{
+  font-family:'Cabin Sketch',cursive;
+  font-weight:400;
+}
+
+.postcard-card--modern.postcard-card--front .pc-front-title{
+  position:absolute;
+  left:80px;
+  top:360px;
+  z-index:5;
+  font-size:66px;
+  line-height:66px;
+  color:#000;
+  white-space:normal;
+}
+
+.postcard-card--modern.postcard-card--front .pc-front-title .pc-underline{
+  text-decoration:underline;
+  text-decoration-thickness:2px;
+  text-underline-offset:4px;
+}
+
+/* Stamp slot — reserved, empty by default */
+
+.postcard-card--modern .pc-stamp-slot--front{
+  position:absolute;
+  left:627px;
+  top:62px;
+  width:137px;
+  height:140px;
+  z-index:4;
+}
+
+.postcard-card--modern .pc-stamp-slot--front img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+/* ===== Modern — Back ===== */
+
+.postcard-card--modern.postcard-card--back{
+  background:transparent;
+}
+
+.postcard-card--modern.postcard-card--back .pc-back-inner{
+  position:absolute;
+  left:32px;
+  top:32px;
+  width:762px;
+  height:508px;
+  border:1.4px dashed rgba(255,255,255,.2);
+  z-index:3;
+  --pc-rule-width:236px;
+  --pc-message-rule-width:346px;
+}
+
+.postcard-card--modern .pc-back-divider{
+  position:absolute;
+  left:326px;
+  top:73px;
+  width:1.4px;
+  height:362px;
+  background:rgba(255,255,255,.35);
+}
+
+.postcard-card--modern .pc-back-title,
+.postcard-card--modern .pc-back-title .pc-underline{
+  font-family:'Cabin Sketch',cursive;
+  font-weight:400;
+}
+
+.postcard-card--modern .pc-back-title{
+  position:absolute;
+  left:48px;
+  top:48px;
+  font-size:36px;
+  line-height:38px;
+  color:#fff;
+  white-space:nowrap;
+}
+
+.postcard-card--modern .pc-back-title .pc-underline{
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+
+.postcard-card--modern .pc-stickers{
+  position:absolute;
+  left:48px;
+  top:216px;
+  display:grid;
+  grid-template-columns:96px 96px;
+  grid-template-rows:96px 96px;
+  gap:20px;
+}
+
+.postcard-card--modern .pc-sticker-slot{
+  width:96px;
+  height:96px;
+}
+
+.postcard-card--modern .pc-sticker-slot--empty{
+  border:1.4px dashed rgba(255,255,255,.2);
+  background:transparent;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.postcard-card--modern .pc-sticker-slot--empty .pc-slot-upload{
+  width:24px;
+  height:24px;
+  opacity:.4;
+  pointer-events:none;
+}
+
+.postcard-card--modern .pc-sticker-slot img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.postcard-card--modern .pc-address{
+  position:absolute;
+  left:386px;
+  top:121px;
+  width:346px;
+}
+
+.postcard-card--modern .pc-field{
+  position:relative;
+  height:48px;
+  margin-bottom:0;
+}
+
+.postcard-card--modern .pc-field label{
+  font-family:Inter,system-ui,sans-serif;
+  font-size:20px;
+  line-height:30px;
+  color:#fff;
+}
+
+.postcard-card--modern .pc-field .pc-handwriting{
+  position:absolute;
+  left:74px;
+  top:0;
+  font-family:'Playpen Sans Thai','Homemade Apple',cursive;
+  font-size:20px;
+  line-height:30px;
+  color:#fff;
+  white-space:nowrap;
+  min-width:1px;
+  min-height:30px;
+}
+
+.postcard-card--modern .pc-field .pc-line{
+  position:absolute;
+  left:0;
+  top:28px;
+  width:var(--pc-rule-width, 236px);
+  height:1.4px;
+  background:rgba(255,255,255,.35);
+}
+
+.postcard-card--modern .pc-message-lines{
+  position:absolute;
+  left:386px;
+  top:268px;
+  width:var(--pc-message-rule-width, 346px);
+  display:flex;
+  flex-direction:column;
+  gap:38.6px;
+  z-index:1;
+  pointer-events:none;
+}
+
+.postcard-card--modern .pc-message-lines .pc-line{
+  position:static;
+  display:block;
+  width:var(--pc-message-rule-width, 346px);
+  height:1.4px;
+  background:rgba(255,255,255,.35);
+}
+
+.postcard-card--modern .pc-message{
+  position:absolute;
+  left:386px;
+  top:235px;
+  width:var(--pc-message-rule-width, 346px);
+  z-index:2;
+  pointer-events:none;
+}
+
+.postcard-card--modern .pc-message-row{
+  position:relative;
+  height:40px;
+  overflow:visible;
+}
+
+.postcard-card--modern .pc-message-text{
+  position:absolute;
+  left:0;
+  top:0;
+  display:block;
+  font-family:'Playpen Sans Thai','Homemade Apple',cursive;
+  font-size:20px;
+  line-height:40px;
+  height:40px;
+  color:#fff;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:var(--pc-message-rule-width, 346px);
+}
+
+/* Title hint — back uses lighter ghost */
+
+.postcard-card--modern.postcard-card--back .pc-line-hint{
+  opacity:.2;
+}
+
+/* Postage stamp slot */
+
+.postcard-card--modern .pc-postage-slot{
+  position:absolute;
+  left:652px;
+  top:30px;
+  width:64px;
+  height:98px;
+  z-index:4;
+}
+
+.postcard-card--modern .pc-postage-frame{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  pointer-events:none;
+}
+
+.postcard-card--modern .pc-postage-art{
+  position:absolute;
+  left:10%;
+  top:7%;
+  width:80%;
+  height:87%;
+  object-fit:cover;
+  pointer-events:none;
+}
+
+.postcard-card--modern .pc-postage-inner{
+  position:absolute;
+  left:10%;
+  top:7%;
+  width:80%;
+  height:87%;
+  background:#d9d9d9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.postcard-card--modern .pc-postage-slot--empty{
+  cursor:pointer;
+}
+
+.postcard-card--modern .pc-postage-slot--empty .pc-slot-upload{
+  width:24px;
+  height:24px;
+  opacity:.4;
+  pointer-events:none;
+}
+
+.postcard-card--modern .pc-sticker-slot,
+.postcard-card--modern .pc-postage-slot--empty{
+  pointer-events:auto;
+  cursor:pointer;
+}
+
+.postcard-card--modern .pc-stamp-slot--back{
+  position:absolute;
+  left:518px;
+  top:373px;
+  width:83px;
+  height:85px;
+  z-index:5;
+}
+
+.postcard-card--modern .pc-stamp-slot--back img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+/* ===== Retro 70s — Figma nodes 1:16 front, 1:89 back ===== */
+
+.postcard-card--retro70.postcard-card--front .pc-front-title,
+.postcard-card--retro70.postcard-card--front .pc-front-title .pc-title-line1,
+.postcard-card--retro70.postcard-card--front .pc-front-title .pc-title-line2,
+.postcard-card--retro70.postcard-card--front .pc-front-title .pc-underline{
+  font-family:'Great Vibes',cursive;
+  font-weight:400;
+  color:var(--pc-front-title-color, #ffe0eb);
+}
+
+.postcard-card--retro70.postcard-card--front .pc-front-title{
+  left:80px;
+  top:auto;
+  bottom:80px;
+  font-size:80px;
+  line-height:80px;
+  transform:rotate(-10deg);
+  transform-origin:left bottom;
+}
+
+.postcard-card--retro70.postcard-card--front .pc-front-title .pc-underline{
+  text-decoration:underline;
+  text-decoration-thickness:2px;
+  text-underline-offset:4px;
+}
+
+.postcard-card--retro70 .pc-photo-gradient,
+.postcard-card--vintage .pc-photo-gradient{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:linear-gradient(56.47deg, rgba(0,0,0,0.16) 4.03%, rgba(6,6,6,0) 53.54%);
+}
+
+.postcard-card--retro70.postcard-card--back .pc-back-inner{
+  border-color:rgba(0,0,0,0.16);
+}
+
+.postcard-card--retro70 .pc-back-divider{
+  background:rgba(0,0,0,0.16);
+}
+
+.postcard-card--retro70 .pc-back-title,
+.postcard-card--retro70 .pc-back-title .pc-title-line1,
+.postcard-card--retro70 .pc-back-title .pc-title-line2,
+.postcard-card--retro70 .pc-back-title .pc-underline{
+  font-family:'Great Vibes',cursive;
+  font-weight:400;
+}
+
+.postcard-card--retro70 .pc-back-title{
+  left:48px;
+  top:48px;
+  font-size:40px;
+  line-height:40px;
+  color:#0c0c0c;
+  transform:rotate(-10deg);
+  transform-origin:left top;
+}
+
+.postcard-card--retro70 .pc-back-title .pc-underline{
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+
+.postcard-card--retro70 .pc-stickers{
+  left:48px;
+  top:216px;
+}
+
+.postcard-card--retro70 .pc-sticker-slot--empty{
+  border-color:rgba(0,0,0,0.16);
+}
+
+.postcard-card--retro70 .pc-field label{
+  color:#282828;
+}
+
+.postcard-card--retro70 .pc-field .pc-handwriting{
+  color:#141ea9;
+}
+
+.postcard-card--retro70 .pc-field .pc-line,
+.postcard-card--retro70 .pc-message-lines .pc-line{
+  background:rgba(0,0,0,0.16);
+}
+
+.postcard-card--retro70 .pc-message-text{
+  color:#141ea9;
+}
+
+.postcard-card--retro70 .pc-postage-slot{
+  left:652px;
+  top:30px;
+  width:80px;
+  height:112px;
+}
+
+.postcard-card--retro70 .pc-postage-art{
+  left:10.53%;
+  top:7.14%;
+  width:80%;
+  height:87.5%;
+}
+
+.postcard-card--retro70 .pc-postage-inner{
+  left:10.53%;
+  top:7.14%;
+  width:80%;
+  height:87.5%;
+}
+
+.postcard-card--retro70 .pc-stamp-slot--front img,
+.postcard-card--retro70 .pc-stamp-slot--back img{
+  object-fit:contain;
+}
+
+/* ===== Vintage — Figma nodes 1:92 front, 1:95 back ===== */
+
+.postcard-card--vintage .pc-vintage-bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:0;
+  pointer-events:none;
+}
+
+.postcard-card--vintage .pc-vintage-inner-frame{
+  position:absolute;
+  left:34.67px;
+  top:31.69px;
+  width:758.62px;
+  height:506.74px;
+  z-index:4;
+  pointer-events:none;
+}
+
+.postcard-card--vintage.postcard-card--front .pc-photo{
+  left:35px;
+  top:32px;
+  width:758px;
+  height:506px;
+  border-radius:12px;
+  overflow:hidden;
+  clip-path:inset(0 round 12px);
+  z-index:2;
+}
+
+.postcard-card--vintage.postcard-card--front .pc-front-title,
+.postcard-card--vintage.postcard-card--front .pc-front-title .pc-title-line1,
+.postcard-card--vintage.postcard-card--front .pc-front-title .pc-title-line2,
+.postcard-card--vintage.postcard-card--front .pc-front-title .pc-underline{
+  font-family:'Great Vibes',cursive;
+  font-weight:400;
+  text-transform:none;
+  color:var(--pc-front-title-color, #ffe0eb);
+}
+
+.postcard-card--vintage.postcard-card--front .pc-front-title{
+  left:80px;
+  top:auto;
+  bottom:80px;
+  font-size:80px;
+  line-height:80px;
+  z-index:5;
+}
+
+.postcard-card--vintage.postcard-card--front .pc-front-title .pc-underline{
+  text-decoration:underline;
+  text-underline-offset:4px;
+}
+
+.postcard-card--vintage .pc-stamp-slot--front{
+  z-index:5;
+}
+
+.postcard-card--vintage .pc-stamp-slot--front img,
+.postcard-card--vintage .pc-stamp-slot--back img{
+  object-fit:contain;
+}
+
+.postcard-card--vintage.postcard-card--back .pc-back-inner{
+  border:none;
+  z-index:2;
+}
+
+.postcard-card--vintage.postcard-card--back .pc-vintage-bg{
+  z-index:0;
+}
+
+.postcard-card--vintage .pc-back-divider{
+  left:326px;
+  background:rgba(0,0,0,0.16);
+}
+
+.postcard-card--vintage .pc-back-title,
+.postcard-card--vintage .pc-back-title .pc-title-line1,
+.postcard-card--vintage .pc-back-title .pc-title-line2,
+.postcard-card--vintage .pc-back-title .pc-underline{
+  font-family:'Great Vibes',cursive;
+  font-weight:400;
+  text-transform:none;
+  color:#0c0c0c;
+}
+
+.postcard-card--vintage .pc-back-title{
+  left:48px;
+  top:48px;
+  font-size:40px;
+  line-height:40px;
+}
+
+.postcard-card--vintage .pc-back-title .pc-underline{
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+
+.postcard-card--vintage .pc-sticker-slot--empty{
+  border-color:rgba(0,0,0,0.16);
+}
+
+.postcard-card--vintage .pc-field label{
+  font-family:'Rye',serif;
+  font-size:16px;
+  line-height:30px;
+  color:#282828;
+  text-transform:uppercase;
+}
+
+.postcard-card--vintage .pc-field .pc-handwriting{
+  color:#141964;
+}
+
+.postcard-card--vintage .pc-field .pc-line,
+.postcard-card--vintage .pc-message-lines .pc-line{
+  background:rgba(0,0,0,0.16);
+}
+
+.postcard-card--vintage .pc-message{
+  top:267px;
+}
+
+.postcard-card--vintage .pc-message-lines{
+  top:300px;
+  gap:40px;
+}
+
+.postcard-card--vintage .pc-message-row{
+  height:38px;
+}
+
+.postcard-card--vintage .pc-message-text{
+  line-height:38px;
+  height:38px;
+  color:#141964;
+}
+
+.postcard-card--vintage .pc-postage-slot{
+  left:654px;
+  top:28px;
+  width:80px;
+  height:106px;
+}
+
+.postcard-card--vintage .pc-postage-art{
+  left:12px;
+  top:4px;
+  width:64px;
+  height:98px;
+}
+
+.postcard-card--vintage .pc-postage-inner{
+  left:12px;
+  top:4px;
+  width:64px;
+  height:98px;
+}
+
+</style>
+<style id="postcard-create">
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  min-height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  background:#fff;
+}
+
+/* Create postcard page — Figma 1440×1024 */
+.create-page{
+  --ink:#0c0c0c;
+  --bg:#fff;
+  --border:rgba(0,0,0,.1);
+  --fill-0:var(--page-frame-fill, #e7dde0);
+  min-height:100%;
+  width:100%;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Inter,system-ui,sans-serif;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+}
+
+.create-stage-wrap{
+  position:relative;
+  flex:0 0 auto;
+  margin:0 auto;
+}
+
+.create-stage{
+  position:relative;
+  width:1440px;
+  height:1024px;
+  flex:0 0 auto;
+  transform-origin:top left;
+  margin:0 auto;
+}
+
+.create-bg-deco{
+  position:absolute;
+  left:608px;
+  top:35px;
+  width:797px;
+  height:954px;
+  pointer-events:none;
+  z-index:0;
+  background:var(--page-frame-fill, #e7dde0);
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
+}
+
+.create-divider-v{
+  position:absolute;
+  left:573px;
+  top:0;
+  width:1px;
+  height:1024px;
+  background:var(--border);
+  z-index:1;
+}
+
+/* ===== Left panel ===== */
+.create-panel{
+  position:absolute;
+  left:125px;
+  top:0;
+  width:408px;
+  height:100%;
+  z-index:2;
+}
+
+.create-topnav{
+  position:absolute;
+  left:125px;
+  top:80px;
+  display:flex;
+  align-items:center;
+  gap:32px;
+  z-index:3;
+}
+.create-topnav a{
+  display:block;
+  width:32px;
+  height:32px;
+  flex-shrink:0;
+}
+.create-topnav a img{width:100%;height:100%;display:block;object-fit:contain;}
+.create-side-tab{
+  border:none;
+  background:none;
+  padding:0;
+  cursor:pointer;
+  font-family:'Instrument Serif',Georgia,serif;
+  font-size:40px;
+  line-height:40px;
+  color:var(--ink);
+  text-transform:lowercase;
+}
+.create-side-tab.is-active{
+  font-style:italic;
+  text-decoration:underline;
+  text-underline-offset:4px;
+}
+.create-topnav-sep{
+  width:1px;
+  height:36px;
+  background:var(--border);
+  flex-shrink:0;
+}
+
+.create-field{
+  position:absolute;
+  left:0;
+  width:408px;
+}
+.create-field--style{top:160px;}
+.create-field--title{top:386px;}
+.create-field--color{top:520px;width:373px;}
+.create-field--stamp{top:630px;width:373px;}
+
+/* Back panel fields */
+.create-field--from{top:160px;}
+.create-field--to{top:276px;}
+.create-field--message{top:392px;}
+.create-field--stickers{
+  top:590px;
+  width:auto;
+  z-index:3;
+  padding-bottom:24px;
+}
+.create-field--postmark-back{top:830px;width:153px;}
+.create-field--postage-pick{top:830px;left:310px;width:auto;}
+
+.create-textarea-wrap{
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  min-height:120px;
+  padding:16px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:#fff;
+}
+.create-textarea-wrap img{width:24px;height:24px;flex-shrink:0;margin-top:2px;display:block;}
+.create-textarea-wrap textarea{
+  flex:1;
+  border:none;
+  outline:none;
+  resize:none;
+  min-height:88px;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:18px;
+  font-weight:500;
+  color:var(--ink);
+  background:transparent;
+  line-height:1.4;
+}
+.create-textarea-wrap textarea::placeholder{color:rgba(0,0,0,.6);}
+
+.create-picker-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  max-width:408px;
+  margin-bottom:12px;
+}
+.create-picker-item{
+  width:64px;
+  height:64px;
+  padding:4px;
+  border:2px solid transparent;
+  border-radius:4px;
+  background:transparent;
+  cursor:pointer;
+  flex-shrink:0;
+  transition:border-color .2s ease,opacity .2s ease;
+}
+.create-picker-item img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  border-radius:2px;
+  pointer-events:none;
+}
+.create-picker-item.is-active{border-color:var(--ink);}
+.create-picker-item.is-dim{opacity:.5;}
+
+.create-postage-pick{
+  display:flex;
+  gap:10px;
+}
+.create-postage-item{
+  position:relative;
+  width:46px;
+  height:64px;
+  padding:0;
+  border:2px solid transparent;
+  background:none;
+  cursor:pointer;
+  flex-shrink:0;
+  opacity:.5;
+  transition:border-color .2s ease,opacity .2s ease;
+}
+.create-postage-item.is-active{
+  border-color:var(--ink);
+  opacity:1;
+}
+.create-postage-frame{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  pointer-events:none;
+}
+.create-postage-art{
+  position:absolute;
+  left:10%;
+  top:7%;
+  width:80%;
+  height:87%;
+  object-fit:cover;
+  display:block;
+  pointer-events:none;
+}
+.create-postage-item img.create-postage-frame,
+.create-postage-item img.create-postage-art{
+  border-radius:0;
+}
+
+.student-id-modal{
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.student-id-modal[hidden]{display:none !important;}
+.student-id-modal__backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(12,12,12,0.45);
+}
+.student-id-modal__panel{
+  position:relative;
+  z-index:1;
+  width:min(420px,100%);
+  padding:28px 24px 22px;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 16px 48px rgba(0,0,0,0.22);
+}
+.student-id-modal__title{
+  margin:0 0 18px;
+  font-family:'Instrument Serif',Georgia,serif;
+  font-size:36px;
+  font-weight:400;
+  line-height:1.1;
+  text-transform:lowercase;
+}
+.student-id-modal__label{
+  display:block;
+  margin:0 0 8px;
+  font-family:'Instrument Serif',Georgia,serif;
+  font-size:22px;
+  font-weight:400;
+  line-height:1.2;
+}
+.student-id-modal__input{
+  width:100%;
+  height:52px;
+  box-sizing:border-box;
+  padding:0 14px;
+  border:1px solid rgba(0,0,0,0.12);
+  border-radius:8px;
+  font-size:22px;
+  font-family:'Instrument Serif',Georgia,serif;
+  font-weight:400;
+}
+.student-id-modal__input:focus{
+  outline:2px solid rgba(12,12,12,0.35);
+  outline-offset:1px;
+}
+.student-id-modal__error{
+  margin:10px 0 0;
+  font-size:13px;
+  color:#a11;
+}
+.student-id-modal__error[hidden]{display:none;}
+.student-id-modal__actions{
+  display:flex;
+  gap:10px;
+  justify-content:flex-end;
+  margin-top:18px;
+}
+.student-id-modal__btn{
+  height:44px;
+  padding:0 18px;
+  border-radius:8px;
+  border:none;
+  font-size:15px;
+  font-weight:500;
+  font-family:inherit;
+  cursor:pointer;
+}
+.student-id-modal__btn--ghost{
+  background:transparent;
+  color:#0c0c0c;
+}
+.student-id-modal__btn--primary{
+  background:#0c0c0c;
+  color:#fff;
+}
+.student-id-modal__btn.is-loading{
+  pointer-events:none;
+  opacity:.85;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.student-id-modal__spinner{
+  width:14px;
+  height:14px;
+  border:2px solid rgba(255,255,255,.35);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:student-id-spin .7s linear infinite;
+  flex-shrink:0;
+}
+@keyframes student-id-spin{
+  to{transform:rotate(360deg)}
+}
+body.student-id-modal-open{overflow:hidden;}
+
+.create-finish{
+  position:absolute;
+  left:0;
+  top:776px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:170px;
+  height:44px;
+  padding:8px 28px;
+  border:none;
+  border-radius:8px;
+  background:var(--ink);
+  color:#fff;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:18px;
+  font-weight:500;
+  text-transform:capitalize;
+  cursor:pointer;
+  transition:opacity .2s ease,transform .15s ease;
+}
+.create-finish:hover{opacity:.88;}
+.create-finish:active{transform:scale(.98);}
+
+.create-field--postage-pick{
+  left:185px;
+  width:200px;
+}
+
+.create-label{
+  font-size:20px;
+  font-weight:600;
+  line-height:32px;
+  margin-bottom:10px;
+  color:var(--ink);
+}
+
+.create-styles{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+.create-style-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:24px;
+  padding:16px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:#fff;
+  cursor:pointer;
+  min-width:106px;
+  transition:border-color .2s ease;
+}
+.create-style-card[hidden]{
+  display:none !important;
+}
+.create-style-card.is-active{
+  border:2px solid var(--ink);
+  padding:15px;
+}
+.create-style-card:disabled{
+  opacity:.45;
+  cursor:default;
+}
+.create-style-card img{
+  width:74px;
+  height:68px;
+  object-fit:cover;
+  display:block;
+}
+.create-style-card span{
+  font-size:18px;
+  font-weight:500;
+  color:var(--ink);
+  white-space:nowrap;
+}
+
+.create-input-wrap{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  height:60px;
+  padding:10px 16px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:#fff;
+}
+.create-input-wrap img{width:24px;height:24px;flex-shrink:0;display:block;}
+.create-input-wrap input{
+  flex:1;
+  border:none;
+  outline:none;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:18px;
+  font-weight:500;
+  color:var(--ink);
+  background:transparent;
+  min-width:0;
+}
+.create-input-wrap input::placeholder{
+  color:rgba(0,0,0,.6);
+}
+
+.create-input-wrap--title{
+  height:60px;
+  align-items:center;
+}
+.create-input-wrap--title img{margin-top:0;}
+
+.create-colors{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  height:36px;
+}
+.create-color{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:2px solid transparent;
+  padding:0;
+  cursor:pointer;
+  flex-shrink:0;
+  transition:transform .15s ease;
+}
+.create-color:hover{transform:scale(1.08);}
+.create-color.is-active{
+  border-color:var(--ink);
+  box-shadow:0 0 0 2px var(--bg);
+}
+.create-color[data-color="white"]{
+  background:#fff;
+  border:1px solid rgba(0,0,0,.15);
+}
+.create-color[data-color="black"]{background:#0c0c0c;}
+.create-color[data-color="pink"]{background:#ffe0eb;}
+.create-color[data-color="yellow"]{background:#fef9dc;}
+.create-color[data-color="green"]{background:#dff5e5;}
+
+.create-stamps{
+  display:flex;
+  gap:10px;
+}
+.create-stamp{
+  position:relative;
+  width:64px;
+  height:64px;
+  padding:4px;
+  border:none;
+  background:#f0eeeb;
+  cursor:pointer;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.create-stamp-plate{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:#0c0c0c;
+  z-index:0;
+}
+.create-stamp--with-plate img{
+  position:relative;
+  z-index:1;
+}
+.create-stamp img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  border-radius:50%;
+}
+.create-stamp.is-active::after{
+  content:'';
+  position:absolute;
+  inset:-3px;
+  border:2px solid var(--ink);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+.create-next{
+  position:absolute;
+  left:0;
+  top:776px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  width:170px;
+  height:60px;
+  padding:10px 32px;
+  border:none;
+  border-radius:8px;
+  background:var(--ink);
+  color:#fff;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:18px;
+  font-weight:500;
+  line-height:1;
+  text-transform:capitalize;
+  cursor:pointer;
+  transition:opacity .2s ease,transform .15s ease;
+}
+.create-next:hover{opacity:.88;}
+.create-next:active{transform:scale(.98);}
+.create-next span{
+  display:block;
+  line-height:1;
+}
+.create-next img{
+  width:24px;
+  height:12px;
+  display:block;
+  flex-shrink:0;
+}
+.create-flip img{width:24px;height:24px;display:block;object-fit:contain;}
+
+.create-hero{
+  position:absolute;
+  left:573px;
+  top:0;
+  width:867px;
+  height:100%;
+  z-index:2;
+}
+
+/* ===== Right panel ===== */
+.create-preview-panel{
+  position:relative;
+  width:100%;
+  height:100%;
+}
+
+.create-heading{
+  position:absolute;
+  left:50%;
+  top:222px;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  font-family:'Instrument Serif',Georgia,serif;
+  font-size:60px;
+  font-weight:400;
+  font-style:normal;
+  line-height:60px;
+  color:var(--ink);
+  text-transform:lowercase;
+  white-space:nowrap;
+  pointer-events:none;
+}
+.create-heading u{
+  text-decoration:underline;
+  text-underline-offset:6px;
+}
+
+.create-preview-wrap{
+  position:absolute;
+  left:99px;
+  top:342px;
+  width:670px;
+  height:464px;
+  overflow:hidden;
+  cursor:pointer;
+}
+.create-preview-scale{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:826px;
+  height:572px;
+  margin-left:-413px;
+  margin-top:-286px;
+  pointer-events:none;
+  perspective:1200px;
+}
+.create-card-flip{
+  position:relative;
+  width:826px;
+  height:572px;
+  transform-origin:center center;
+  transform:scale(var(--preview-scale, 1)) rotateY(0deg);
+  will-change:transform;
+}
+.create-card-face{
+  position:absolute;
+  inset:0;
+}
+.create-card-flip.is-flipping.show-front .create-card-face--front,
+.create-card-flip:not(.is-flipped):not(.is-flipping) .create-card-face--front{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+.create-card-flip.is-flipping.show-front .create-card-face--back,
+.create-card-flip:not(.is-flipped):not(.is-flipping) .create-card-face--back{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+.create-card-flip.is-flipping.show-back .create-card-face--back,
+.create-card-flip.is-flipped:not(.is-flipping) .create-card-face--back{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+.create-card-flip.is-flipping.show-back .create-card-face--front,
+.create-card-flip.is-flipped:not(.is-flipping) .create-card-face--front{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+.create-preview-scale .pc-photo--empty,
+.create-preview-scale .pc-photo:not(.pc-photo--empty),
+.create-preview-scale .pc-sticker-slot,
+.create-preview-scale .pc-postage-slot--empty{
+  pointer-events:auto;
+  cursor:pointer;
+}
+
+.create-flip{
+  position:absolute;
+  left:50%;
+  top:838px;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:16px;
+  border:none;
+  background:none;
+  cursor:pointer;
+  padding:4px 8px;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:18px;
+  line-height:20px;
+  color:var(--ink);
+}
+.create-panel-back[hidden],
+.create-panel-front[hidden]{
+  display:none !important;
+}
+
+.create-back-meta{
+  display:contents;
+}
+
+@media (max-width:900px){
+  .create-page{
+    --mobile-pink:var(--page-frame-fill, #e7dde0);
+    --mobile-pad:var(--shell-pad, 32px);
+    display:flex;
+    flex-direction:column;
+    height:100dvh;
+    overflow:hidden;
+  }
+  html,body{
+    height:100%;
+    height:100dvh;
+    overflow:hidden;
+  }
+  body{align-items:stretch !important;}
+
+  .create-stage-wrap{
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    min-height:0;
+    width:100%;
+    max-width:var(--shell-max, 440px);
+    margin:0 auto;
+    overflow:hidden;
+  }
+
+  .create-stage{
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    min-height:0;
+    transform:none !important;
+    width:100%;
+    max-width:var(--shell-max, 440px);
+    margin:0 auto;
+    overflow:hidden;
+  }
+
+  .create-bg-deco,
+  .create-divider-v,
+  .create-heading{display:none;}
+
+  .create-topnav{
+    position:relative;
+    left:auto;
+    top:auto;
+    order:1;
+    flex-shrink:0;
+    gap:16px;
+    padding:40px 24px 0;
+    margin:0;
+    background:var(--mobile-pink);
+    z-index:2;
+  }
+  .create-topnav a{width:24px;height:24px;}
+  .create-side-tab{
+    font-size:30px;
+    line-height:38px;
+  }
+  .create-topnav-sep{height:30px;}
+
+  .create-hero{
+    position:relative;
+    left:auto;
+    top:auto;
+    order:2;
+    flex-shrink:0;
+    width:100%;
+    height:auto;
+    background:var(--mobile-pink);
+    padding:0 10px 24px;
+    z-index:2;
+  }
+
+  .create-preview-panel{
+    padding:0;
+    height:auto;
+  }
+
+  .create-preview-wrap{
+    position:relative;
+    left:auto;
+    top:auto;
+    width:min(calc(100vw - 20px), 420px);
+    max-width:100%;
+    aspect-ratio:826 / 572;
+    height:auto;
+    min-height:0;
+    margin:32px auto 0;
+    overflow:hidden;
+  }
+
+  .create-flip{
+    position:relative;
+    top:auto;
+    left:auto;
+    transform:none;
+    margin:24px auto 0;
+    gap:12px;
+    font-size:16px;
+    line-height:20px;
+    padding:0;
+  }
+  .create-flip img{width:18px;height:18px;}
+
+  .create-panel{
+    position:relative;
+    order:3;
+    flex:1;
+    min-height:0;
+    left:0;
+    width:100%;
+    padding:32px var(--mobile-pad) 40px;
+    height:auto;
+    background:#fff;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+  }
+
+  .create-field{
+    position:relative;
+    top:auto !important;
+    left:auto !important;
+    width:100% !important;
+    margin-bottom:0;
+  }
+  .create-field--style{margin-bottom:16px;}
+  .create-field--title,
+  .create-field--color,
+  .create-field--stamp,
+  .create-field--from,
+  .create-field--to,
+  .create-field--message{margin-bottom:16px;}
+  .create-field--stickers{
+    margin-bottom:16px;
+    padding-bottom:0;
+    z-index:auto;
+  }
+
+  .create-label{
+    font-size:18px;
+    line-height:28px;
+    margin-bottom:10px;
+  }
+
+  .create-styles{
+    gap:10px;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:4px;
+  }
+  .create-style-card{
+    width:119px;
+    min-width:119px;
+    gap:24px;
+    padding:16px;
+  }
+  .create-style-card.is-active{padding:15px;}
+  .create-style-card span{font-size:16px;}
+
+  .create-input-wrap input,
+  .create-textarea-wrap textarea{font-size:16px;}
+  .create-input-wrap input::placeholder,
+  .create-textarea-wrap textarea::placeholder{font-size:16px;}
+
+  .create-colors{height:36px;}
+
+  .create-back-meta{
+    display:flex;
+    gap:24px;
+    align-items:flex-start;
+    margin-bottom:16px;
+  }
+  .create-back-meta .create-field--postmark-back,
+  .create-back-meta .create-field--postage-pick{
+    flex:1;
+    margin-bottom:0;
+  }
+
+  .create-picker-row{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    max-width:none;
+    gap:8px;
+    margin-bottom:0;
+    padding-bottom:4px;
+  }
+
+  .create-next,
+  .create-finish{
+    position:relative;
+    top:auto;
+    left:auto;
+    width:100%;
+    max-width:var(--content-max, 376px);
+    margin:24px auto 0;
+    display:flex;
+  }
+
+  .create-panel-front .create-field--stamp{margin-bottom:0;}
+}
+</style>
+<script src="/assets/firebase-config.js"></script>
+<script type="module" src="/assets/firebase-postcard.js?v=3"></script>
+<script type="module" crossorigin src="/assets/create-XUFN6mz3.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/postcard-card-Dn_Hk0Aw.js">
+  <link rel="modulepreload" crossorigin href="/assets/postcardStorage-Bd7mGBYa.js">
+  <link rel="stylesheet" crossorigin href="/assets/create-DjmCj686.css">
+  <link rel="stylesheet" crossorigin href="/assets/mobile-responsive-Dfoc304p.css">
+  <link rel="stylesheet" href="/assets/scrapbook-photo.css">
+</head>
+<body>
+
+<div class="create-page" id="createPage">
+  <div class="create-stage-wrap" id="createStageWrap">
+  <div class="create-stage" id="createStage">
+
+    <div class="create-bg-deco" aria-hidden="true"></div>
+    <div class="create-divider-v" aria-hidden="true"></div>
+
+    <nav class="create-topnav" aria-label="Card side">
+      <a aria-label='Home' href="/">
+        <img data-create-asset="iconHome" alt="">
+      </a>
+      <button type="button" class="create-side-tab is-active" data-side="front">front side</button>
+      <span class="create-topnav-sep" aria-hidden="true"></span>
+      <button type="button" class="create-side-tab" data-side="back">back side</button>
+    </nav>
+
+    <div class="create-hero">
+      <section class="create-preview-panel" aria-label="Postcard preview">
+        <h1 class="create-heading">
+          <span>create ur postcard</span><br>
+          <span>for <u>ur mom</u></span>
+        </h1>
+
+        <div class="create-preview-wrap" id="previewWrap" role="button" tabindex="0" aria-label="Flip postcard preview">
+          <div class="create-preview-scale">
+            <div class="create-card-flip" id="cardFlip">
+              <div class="create-card-face create-card-face--front" id="previewFront"></div>
+              <div class="create-card-face create-card-face--back" id="previewBack"></div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="create-flip" id="btnFlip">
+          <img data-create-asset="iconFlip" alt="">
+          <span>flip it</span>
+        </button>
+      </section>
+    </div>
+
+    <!-- Left: front controls -->
+    <aside class="create-panel create-panel-front">
+      <div class="create-field create-field--style">
+        <p class="create-label">Choose style of card:</p>
+        <div class="create-styles" role="list">
+          <button type="button" class="create-style-card" data-style="modern" role="listitem" hidden aria-hidden="true" tabindex="-1">
+            <img data-create-asset="styleModern" alt="">
+            <span>Modern</span>
+          </button>
+          <button type="button" class="create-style-card" data-style="retro70" role="listitem">
+            <img data-create-asset="styleRetro" alt="">
+            <span>Retro</span>
+          </button>
+          <button type="button" class="create-style-card is-active" data-style="vintage" role="listitem">
+            <img data-create-asset="styleVintage" alt="">
+            <span>Vintage</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="create-field create-field--title">
+        <label class="create-label" for="titleInput">Add title:</label>
+        <div class="create-input-wrap create-input-wrap--title">
+          <img data-create-asset="iconTitle" alt="">
+          <input id="titleInput" type="text" placeholder="(e.g. love u mom)" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="create-field create-field--color">
+        <p class="create-label">Choose color of the text:</p>
+        <div class="create-colors" role="radiogroup" aria-label="Text color">
+          <button type="button" class="create-color is-active" data-color="black" data-hex="#0c0c0c" aria-checked="true" role="radio" title="Black"></button>
+          <button type="button" class="create-color" data-color="white" data-hex="#ffffff" role="radio" title="White"></button>
+          <button type="button" class="create-color" data-color="pink" data-hex="#ffe0eb" role="radio" title="Pink"></button>
+          <button type="button" class="create-color" data-color="yellow" data-hex="#fef9dc" role="radio" title="Yellow"></button>
+          <button type="button" class="create-color" data-color="green" data-hex="#dff5e5" role="radio" title="Green"></button>
+        </div>
+      </div>
+
+      <div id="frontPostmarkPicker" hidden aria-hidden="true"></div>
+
+      <button type="button" class="create-next" id="btnNext">
+        <span>next</span>
+        <img data-create-asset="iconArrow" alt="">
+      </button>
+    </aside>
+
+    <!-- Left: back controls -->
+    <aside class="create-panel create-panel-back" hidden>
+      <div class="create-field create-field--from">
+        <label class="create-label" for="fromInput">From:</label>
+        <div class="create-input-wrap">
+          <img data-create-asset="iconTitle" alt="">
+          <input id="fromInput" type="text" placeholder="ur name" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="create-field create-field--to">
+        <label class="create-label" for="toInput">To:</label>
+        <div class="create-input-wrap">
+          <img data-create-asset="iconTitle" alt="">
+          <input id="toInput" type="text" placeholder="mom / mama / แม่" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="create-field create-field--message">
+        <label class="create-label" for="messageInput">Write your message:</label>
+        <div class="create-textarea-wrap">
+          <img data-create-asset="iconTitle" alt="">
+          <textarea id="messageInput" rows="4" placeholder="say something soft to mom...."></textarea>
+        </div>
+      </div>
+
+      <div id="stickerPicker" hidden aria-hidden="true"></div>
+
+      <div class="create-back-meta">
+      <div id="backPostmarkPicker" hidden aria-hidden="true"></div>
+      <div id="postagePicker" hidden aria-hidden="true"></div>
+      </div>
+
+      <button type="button" class="create-finish" id="btnFinish">Finish</button>
+    </aside>
+
+  </div>
+  </div>
+</div>
+
+<input id="fileInput" type="file" accept="image/*" hidden>
+<input id="stickerFileInput" type="file" accept="image/*" hidden>
+<input id="postageFileInput" type="file" accept="image/*" hidden>
+
+<div id="studentIdModal" class="student-id-modal" hidden>
+  <div class="student-id-modal__backdrop" data-student-modal-close="1"></div>
+  <div class="student-id-modal__panel" role="dialog" aria-modal="true" aria-labelledby="studentIdModalTitle">
+    <h2 class="student-id-modal__title" id="studentIdModalTitle">almost done</h2>
+    <label class="student-id-modal__label" for="studentIdInput">Student ID</label>
+    <input class="student-id-modal__input" id="studentIdInput" type="text" inputmode="numeric" placeholder="e.g. 12345" autocomplete="off" maxlength="5">
+    <p class="student-id-modal__error" id="studentIdModalError" hidden></p>
+    <div class="student-id-modal__actions">
+      <button type="button" class="student-id-modal__btn student-id-modal__btn--ghost" data-student-modal-close="1">Cancel</button>
+      <button type="button" class="student-id-modal__btn student-id-modal__btn--primary" id="studentIdModalConfirm">Save &amp; finish</button>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/create-student-modal.js"></script>
+<script src="/assets/retro-filter.js"></script>
+<script src="/assets/scrapbook-photo.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,489 @@
+/* Parents lookup — search overlay + share-style result */
+
+.parents-search {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 24px;
+  box-sizing: border-box;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.parents-search.is-leaving {
+  opacity: 0;
+  transform: translateY(-16px);
+  pointer-events: none;
+}
+
+.parents-search[hidden] {
+  display: none !important;
+}
+
+/* Teacher letter before the card */
+.parents-letter {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 24px;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  pointer-events: none;
+}
+
+.parents-letter.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.parents-letter[hidden] {
+  display: none !important;
+}
+
+.parents-letter__card {
+  width: min(560px, 100%);
+  max-height: min(88dvh, 820px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  font-family: "Playpen Sans Thai", Inter, system-ui, sans-serif;
+  color: #1a1a1a;
+}
+
+.parents-letter__title {
+  margin: 0 0 20px;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(22px, 4vw, 28px);
+  font-weight: 400;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.parents-letter__card p {
+  margin: 0 0 14px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.parents-letter__card strong {
+  font-weight: 700;
+}
+
+.parents-letter__sign {
+  margin-top: 8px !important;
+  margin-bottom: 28px !important;
+  text-align: right;
+  font-size: 18px !important;
+  font-weight: 600;
+}
+
+.parents-letter__progress {
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.parents-letter__progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: #0c0c0c;
+  transition: width 0.1s linear;
+}
+
+.share-page.is-letter .share-stage-wrap {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.share-page.is-letter .parents-search {
+  display: none !important;
+}
+
+.parents-search__title {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 12px 28px 8px;
+}
+
+.parents-search__heading {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(36px, 5vw, 50px);
+  line-height: 1.1;
+  font-weight: 400;
+  text-transform: lowercase;
+  text-align: center;
+  color: #0c0c0c;
+}
+
+.parents-search__heading em {
+  font-style: italic;
+}
+
+.parents-search__postmark {
+  position: absolute;
+  right: -28px;
+  top: -36px;
+  width: clamp(110px, 22vw, 148px);
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  transform: rotate(8deg);
+  opacity: 1;
+  z-index: 0;
+  /* Drop black backdrop from the jasmine art */
+  mix-blend-mode: screen;
+  filter: contrast(1.05);
+}
+
+.parents-form {
+  width: min(360px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.parents-label {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #0c0c0c;
+}
+
+.parents-otp {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.parents-otp__digit {
+  box-sizing: border-box;
+  width: 56px;
+  height: 64px;
+  flex: 0 0 56px;
+  padding: 0;
+  border: 1.5px solid rgba(0, 0, 0, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  font-family: Inter, system-ui, sans-serif;
+  line-height: 64px;
+  color: #0c0c0c;
+  caret-color: #0c0c0c;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.parents-otp__digit:focus {
+  outline: none;
+  border-color: rgba(12, 12, 12, 0.55);
+  box-shadow: 0 0 0 3px rgba(12, 12, 12, 0.1);
+}
+
+.parents-otp__digit:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.parents-submit {
+  height: 52px;
+  margin-top: 4px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 10px;
+  background: #0c0c0c;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: Inter, system-ui, sans-serif;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.parents-submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.parents-submit.is-loading {
+  pointer-events: none;
+}
+
+.parents-submit__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: parents-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes parents-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.parents-error {
+  margin: 0;
+  min-height: 1.2em;
+  font-size: 14px;
+  font-family: Inter, system-ui, sans-serif;
+  color: #a11;
+  text-align: center;
+}
+
+.parents-error[hidden] {
+  display: none;
+}
+
+/* Hide card stage while searching */
+.share-page.is-search .share-stage-wrap {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.share-page.is-result .share-stage-wrap {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.share-page.is-result .share-card-slot {
+  display: block;
+  left: 50%;
+  top: 46%;
+  width: 620px;
+  height: 565px;
+  opacity: 0;
+  transform: translate(-50%, -50%) translateY(18px) scale(0.97);
+  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.share-page.is-result .share-card-slot.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.share-page.is-result .share-preview-raster.is-active {
+  display: block;
+  cursor: pointer;
+}
+
+.parents-flip {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: calc(46% + 300px);
+  transform: translateX(-50%);
+  z-index: 4;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 18px;
+  line-height: 1;
+  color: #0c0c0c;
+}
+
+.share-page.is-result .parents-flip {
+  display: inline-flex;
+}
+
+.parents-flip[hidden] {
+  display: none !important;
+}
+
+.parents-flip__icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.parents-flip:hover {
+  opacity: 0.75;
+}
+
+.parents-flip:active {
+  transform: translateX(-50%) scale(0.98);
+}
+
+/* Scrapbook photo viewer (polaroid only) */
+.parents-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.parents-lightbox[hidden] {
+  display: none !important;
+}
+
+.parents-lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: rgba(12, 12, 12, 0.72);
+  cursor: pointer;
+}
+
+.parents-lightbox__panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: min(420px, 100%);
+  max-height: 100%;
+}
+
+.parents-lightbox__x {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 999px;
+  background: #fff;
+  color: #0c0c0c;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.parents-lightbox__polaroid {
+  width: min(360px, 86vw);
+  padding: 14px 14px 48px;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  transform: rotate(-1.5deg);
+}
+
+.parents-lightbox__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  background: #ececec;
+}
+
+.parents-lightbox__hint {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+body.parents-lightbox-open {
+  overflow: hidden;
+}
+
+@media (max-width: 420px) {
+  .parents-form {
+    width: min(320px, 100%);
+  }
+
+  .parents-otp {
+    gap: 6px;
+  }
+
+  .parents-otp__digit {
+    width: 48px;
+    height: 56px;
+    flex-basis: 48px;
+    font-size: 24px;
+    line-height: 56px;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 900px) {
+  .share-page.is-result .share-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .share-page.is-result .share-card-slot {
+    position: relative;
+    left: auto;
+    top: auto;
+    order: 1;
+    width: min(92vw, 420px);
+    height: auto;
+    aspect-ratio: 376 / 343;
+    transform: translateY(18px) scale(0.97);
+  }
+
+  .share-page.is-result .share-card-slot.is-visible {
+    transform: translateY(0) scale(1);
+  }
+
+  .share-page.is-result .parents-flip {
+    position: relative;
+    left: auto;
+    top: auto;
+    order: 2;
+    transform: none;
+  }
+
+  .parents-flip:active {
+    transform: scale(0.98);
+  }
+}

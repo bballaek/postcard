@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share your postcard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&family=Great+Vibes&family=Homemade+Apple&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=Playpen+Sans+Thai:wght@400;500;600;700&family=Rye&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/thai-font.css">
+<script src="/assets/firebase-config.js"></script>
+<script type="module" src="/assets/firebase-postcard.js?v=3"></script>
+<script src="/assets/frame-background.js"></script>
+<script src="/assets/retro-filter.js"></script>
+  <script type="module" crossorigin src="/assets/share-Bkgfm5lL.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/postcard-card-Dn_Hk0Aw.js">
+  <link rel="modulepreload" crossorigin href="/assets/postcardStorage-Bd7mGBYa.js">
+  <link rel="stylesheet" crossorigin href="/assets/share-z49bfZbT.css">
+  <link rel="stylesheet" crossorigin href="/assets/frame-background-BEsfpwb_.css">
+  <link rel="stylesheet" crossorigin href="/assets/postcard-card-CqVokCik.css">
+  <link rel="stylesheet" crossorigin href="/assets/mobile-responsive-Dfoc304p.css">
+  <link rel="stylesheet" href="/assets/scrapbook-photo.css">
+</head>
+<body>
+<div class="share-sheet frame-sheet" id="shareSheet" aria-hidden="true">
+  <svg class="share-stamp frame-stamp" id="shareStamp" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none" overflow="visible">
+    <defs>
+      <mask id="stampMask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+        <rect id="stampMaskFill" fill="#fff"/>
+        <g id="stampHoleCircles" fill="#000"/>
+      </mask>
+    </defs>
+    <rect id="stampFill" mask="url(#stampMask)"/>
+  </svg>
+</div>
+
+<div class="share-page frame-page is-loading" id="sharePage">
+  <div class="share-stage-wrap" id="shareStageWrap">
+  <div class="share-stage" id="shareStage">
+
+    <h1 class="share-heading">share your <em>postcard!</em></h1>
+
+    <div class="share-card-slot" id="shareCardSlot">
+      <div class="share-preview-placeholder" id="sharePreviewPlaceholder" aria-hidden="true"></div>
+      <div class="share-preview-raster" id="sharePreviewRaster" hidden role="button" tabindex="0" aria-pressed="false" aria-label="Flip postcard preview" aria-live="polite">
+        <div class="preview-compose">
+          <img class="share-envelope" src="/assets/envelope-72W9nEuG.png" alt="">
+          <img class="share-card-back" id="shareCardBack" src="" alt="">
+          <img class="share-card-front" id="shareCardFront" src="" alt="Your postcard preview">
+        </div>
+      </div>
+      <div class="share-preview-live" id="sharePreview" hidden role="button" tabindex="0" aria-pressed="false" aria-label="Flip postcard preview" aria-live="polite">
+        <div class="share-card-scale" id="shareCardScale">
+          <div class="share-card-flip" id="shareCardFlip">
+            <div class="share-card-face share-card-face--front" id="shareCardFrontMount"></div>
+            <div class="share-card-face share-card-face--back" id="shareCardBackMount"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="share-panel" style="display:none" aria-hidden="true">
+      <div class="share-link-block">
+        <p class="share-label">Share your postcard:</p>
+        <div class="share-link-field">
+          <img class="share-link-icon" src="data:image/svg+xml,%3csvg%20preserveAspectRatio='none'%20width='100%25'%20height='100%25'%20overflow='visible'%20style='display:%20block;'%20viewBox='0%200%2023.9994%2024'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cg%20id='Group'%3e%3cpath%20id='Vector'%20d='M9.94944%2018.2926L7.12141%2021.1207C5.94896%2022.2931%204.05028%2022.2931%202.87882%2021.1209C1.70713%2019.9492%201.70713%2018.0503%202.87859%2016.8789L8.53564%2011.2218C9.7071%2010.0503%2011.606%2010.0503%2012.7774%2011.2218C13.1679%2011.6123%2013.8011%2011.6123%2014.1917%2011.2218C14.5822%2010.8313%2014.5822%2010.1981%2014.1917%209.8076C12.2391%207.85505%209.07395%207.85505%207.12141%209.8076L1.46441%2015.4646C-0.488136%2017.4171%20-0.488136%2020.5823%201.46441%2022.5348C3.41672%2024.4884%206.58211%2024.4884%208.53568%2022.5348L11.3637%2019.7068C11.7542%2019.3163%2011.7542%2018.6831%2011.3637%2018.2926C10.9732%2017.9021%2010.34%2017.9021%209.94944%2018.2926Z'%20fill='var(--fill-0,%20black)'/%3e%3cpath%20id='Vector_2'%20d='M22.535%201.46441C20.5825%20-0.488136%2017.4163%20-0.488136%2015.4638%201.46441L12.0707%204.85743C11.6802%205.24794%2011.6802%205.88114%2012.0707%206.27165C12.4613%206.66217%2013.0944%206.66217%2013.485%206.27165L16.878%202.87863C18.0494%201.70713%2019.9493%201.70713%2021.1208%202.87863C22.2923%204.05009%2022.2923%205.94896%2021.1208%207.12042L14.8988%2013.3425C13.7273%2014.514%2011.8284%2014.514%2010.657%2013.3425C10.2665%2012.952%209.63327%2012.952%209.24275%2013.3425C8.85223%2013.733%208.85223%2014.3662%209.24275%2014.7567C11.1953%2016.7093%2014.3605%2016.7093%2016.313%2014.7567L22.535%208.5347C24.4876%206.58216%2024.4876%203.41695%2022.535%201.46441Z'%20fill='var(--fill-0,%20black)'/%3e%3c/g%3e%3c/svg%3e" alt="">
+          <span class="share-link-text" id="shareLinkText">htttp//:example_of_your_future_link</span>
+        </div>
+      </div>
+      <button type="button" class="share-copy-btn" id="btnCopy">
+        <span class="share-copy-label">Copy</span>
+        <img class="share-copy-icon" src="data:image/svg+xml,%3csvg%20width='32'%20height='32'%20viewBox='0%200%2032%2032'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%20aria-hidden='true'%3e%3crect%20x='9'%20y='3'%20width='18'%20height='22'%20rx='2'%20stroke='white'%20stroke-width='2'/%3e%3cpath%20d='M7%209H5C3.895%209%203%209.895%203%2011V25C3%2026.105%203.895%2027%205%2027H19C20.105%2027%2021%2026.105%2021%2025V23'%20stroke='white'%20stroke-width='2'/%3e%3c/svg%3e" alt="">
+      </button>
+    </div>
+
+  </div>
+  </div>
+</div>
+
+<script src="/assets/scrapbook-photo.js"></script>
+</body>
+</html>

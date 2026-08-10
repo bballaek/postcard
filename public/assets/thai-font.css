@@ -1,0 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Playpen+Sans+Thai:wght@400;500;600;700&display=swap");
+
+/* Thai (and mixed) user-facing handwriting / form text */
+.pc-handwriting,
+.pc-message-text,
+#fromInput,
+#toInput,
+#messageInput,
+#titleInput,
+.student-id-modal__error {
+  font-family: "Playpen Sans Thai", "Homemade Apple", cursive, system-ui, sans-serif;
+}

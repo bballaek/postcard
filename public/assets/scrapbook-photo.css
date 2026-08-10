@@ -1,0 +1,244 @@
+/* Default postcard front backgrounds */
+
+.pc-photo--empty {
+  background: transparent;
+  position: relative;
+}
+
+.postcard-card--vintage .pc-photo--empty {
+  background: transparent !important;
+}
+
+.postcard-card--vintage .pc-photo--empty .pc-default-bg {
+  display: none !important;
+}
+
+/* Match Retro rounded photo (clip survives preview scale transform) */
+.postcard-card--vintage.postcard-card--front .pc-photo {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  clip-path: inset(0 round 12px);
+  -webkit-clip-path: inset(0 round 12px);
+  transform: translateZ(0);
+}
+
+.postcard-card--vintage.postcard-card--front .pc-photo > img,
+.postcard-card--vintage.postcard-card--front .pc-photo > canvas,
+.postcard-card--vintage.postcard-card--front .pc-photo .pc-default-bg,
+.postcard-card--vintage.postcard-card--front .pc-photo .pc-photo-gradient {
+  border-radius: 12px !important;
+}
+
+.postcard-card--vintage.postcard-card--front .pc-vintage-inner-frame {
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.pc-photo--empty .pc-default-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.pc-photo--empty .pc-upload-cta {
+  position: relative;
+  z-index: 2;
+  opacity: 0.85;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(2px);
+}
+
+.create-style-card img {
+  object-fit: cover;
+}
+
+/* Back side: single 4:5 photo (replaces sticker grid) */
+
+.pc-stickers.pc-stickers--single-photo {
+  display: block !important;
+  width: 232px !important;
+  height: 290px !important; /* 4:5 */
+  top: 168px !important; /* was ~216px — nudge up */
+  gap: 0 !important;
+  grid-template-columns: none !important;
+  grid-template-rows: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  overflow: visible;
+}
+
+.pc-stickers.pc-stickers--single-photo
+  .pc-sticker-slot:not([data-slot="sticker-0"]) {
+  display: none !important;
+}
+
+.pc-stickers.pc-stickers--single-photo .pc-sticker-slot[data-slot="sticker-0"] {
+  position: relative;
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer;
+  display: block !important;
+  pointer-events: auto !important;
+}
+
+.pc-stickers.pc-stickers--single-photo
+  .pc-sticker-slot[data-slot="sticker-0"]
+  > img.pc-slot-upload,
+.pc-stickers.pc-stickers--single-photo
+  .pc-sticker-slot[data-slot="sticker-0"]
+  > img:not(.back-photo-img) {
+  display: none !important;
+}
+
+.back-photo-frame {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background: #fff;
+  border: 12px solid #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transform: rotate(-2.5deg);
+  transform-origin: center center;
+}
+
+.back-photo-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: 0 !important;
+}
+
+.back-photo-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #ececec;
+  color: #0c0c0c;
+}
+
+.back-photo-plus {
+  width: 48px;
+  height: 48px;
+  border: 1.5px dashed #0c0c0c;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  line-height: 1;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.back-photo-label {
+  font-family: "Instrument Serif", Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  line-height: 1.2;
+  text-align: center;
+  max-width: 120px;
+}
+
+/* Photo lightbox */
+body.back-photo-lightbox-open {
+  overflow: hidden;
+}
+
+.back-photo-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.back-photo-lightbox[hidden] {
+  display: none !important;
+}
+
+.back-photo-lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.back-photo-lightbox__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 420px);
+  max-height: min(88dvh, 720px);
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px 16px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
+}
+
+.back-photo-lightbox__close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  color: #0c0c0c;
+}
+
+.back-photo-lightbox__img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+  background: #f0f0f0;
+}
+
+.back-photo-lightbox__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.back-photo-lightbox__btn {
+  flex: 1;
+  height: 48px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  background: #0c0c0c;
+  color: #fff;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.back-photo-lightbox__btn--danger {
+  background: #fff;
+  color: #9b1c1c;
+  border-color: rgba(155, 28, 28, 0.35);
+}

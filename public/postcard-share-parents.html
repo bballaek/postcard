@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Postcard for parents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch&family=Great+Vibes&family=Homemade+Apple&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=Playpen+Sans+Thai:wght@400;500;600;700&family=Rye&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/thai-font.css">
+<script src="/assets/page-theme.js"></script>
+<script src="/assets/frame-background.js"></script>
+<script src="/assets/retro-filter.js"></script>
+<link rel="stylesheet" href="/assets/frame-background-BEsfpwb_.css">
+<link rel="stylesheet" href="/assets/create-DjmCj686.css">
+<link rel="stylesheet" href="/assets/share-z49bfZbT.css">
+<link rel="stylesheet" href="/assets/postcard-card-CqVokCik.css">
+<link rel="stylesheet" href="/assets/mobile-responsive-Dfoc304p.css">
+<link rel="stylesheet" href="/assets/scrapbook-photo.css">
+<link rel="stylesheet" href="/assets/parents-share.css">
+<script src="/assets/firebase-config.js"></script>
+<script type="module" src="/assets/firebase-postcard.js?v=3"></script>
+<script type="module" src="/assets/parents-share.js"></script>
+</head>
+<body>
+<div class="share-sheet frame-sheet" id="shareSheet" aria-hidden="true">
+  <svg class="share-stamp frame-stamp" id="shareStamp" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none" overflow="visible">
+    <defs>
+      <mask id="stampMask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+        <rect id="stampMaskFill" fill="#fff"/>
+        <g id="stampHoleCircles" fill="#000"/>
+      </mask>
+    </defs>
+    <rect id="stampFill" mask="url(#stampMask)"/>
+  </svg>
+</div>
+
+<div class="share-page frame-page is-search" id="parentsPage" data-style="vintage">
+  <div class="parents-search" id="parentsSearch">
+    <div class="parents-search__title">
+      <img
+        class="parents-search__postmark"
+        src="/assets/mali.png"
+        alt=""
+        aria-hidden="true"
+      >
+      <h1 class="parents-search__heading">postcard for <em>parents</em></h1>
+    </div>
+    <form class="parents-form" id="parentsForm">
+      <label class="parents-label" id="studentIdLabel">Student ID</label>
+      <div class="parents-otp" id="parentsOtp" role="group" aria-labelledby="studentIdLabel">
+        <input class="parents-otp__digit" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit 1 of 5" data-otp-index="0">
+        <input class="parents-otp__digit" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 2 of 5" data-otp-index="1">
+        <input class="parents-otp__digit" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 3 of 5" data-otp-index="2">
+        <input class="parents-otp__digit" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 4 of 5" data-otp-index="3">
+        <input class="parents-otp__digit" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 5 of 5" data-otp-index="4">
+      </div>
+      <button class="parents-submit" id="parentsSubmit" type="submit">View card</button>
+      <p class="parents-error" id="parentsError" hidden></p>
+    </form>
+  </div>
+
+  <div class="share-stage-wrap" id="shareStageWrap">
+    <div class="share-stage" id="shareStage">
+      <div class="share-card-slot" id="shareCardSlot" hidden>
+        <div
+          class="share-preview-raster"
+          id="sharePreviewRaster"
+          hidden
+          role="button"
+          tabindex="0"
+          aria-pressed="false"
+          aria-label="Flip postcard. On the back, click again to view the photo."
+          aria-live="polite"
+        >
+          <div class="preview-compose">
+            <img class="share-envelope" id="parentsEnvelope" src="/assets/envelope-72W9nEuG.png" alt="">
+            <img class="share-card-back" id="shareCardBack" src="" alt="">
+            <img class="share-card-front" id="shareCardFront" src="" alt="Your postcard preview">
+          </div>
+        </div>
+      </div>
+      <button type="button" class="parents-flip" id="parentsFlipBtn" hidden>
+        <svg class="parents-flip__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M7 7h7a4 4 0 0 1 4 4v1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M9 5 7 7l2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M17 17H10a4 4 0 0 1-4-4v-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="m15 19 2-2-2-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>flip it</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="parents-letter" id="parentsLetter" hidden>
+    <article class="parents-letter__card">
+      <h2 class="parents-letter__title">💙 ถึงผู้ปกครองทุกท่าน เนื่องในโอกาสวันแม่แห่งชาติ</h2>
+      <p>
+        ม.หวังว่า <strong>สิ่งเล็ก ๆ น้อย ๆ ที่นักเรียนได้ตั้งใจทำในวันนี้</strong>
+        จะช่วยเติมเต็มรอยยิ้ม สร้างความสุข และเป็นพลังใจดี ๆ ให้กับผู้ปกครองทุกท่าน
+        ก่อนที่จะกลับไปทำงานและทำหน้าที่ในแต่ละวันครับ
+      </p>
+      <p>
+        วันนี้ลูก ๆ ทุกคนได้แสดงออกถึง <strong>ความรัก ความตั้งใจ และความใส่ใจ</strong>
+        ผ่านสิ่งที่พวกเขาตั้งใจทำให้กับครอบครัวอย่างเต็มที่
+        ม.รู้สึกดีใจและภูมิใจที่ได้เห็นความตั้งใจของนักเรียนทุกคนครับ
+      </p>
+      <p>
+        แม้จะเป็นเพียงสิ่งเล็ก ๆ แต่ ม.เชื่อว่า
+        <strong>ความรักและความตั้งใจของลูก ๆ มีคุณค่ามากกว่าสิ่งของใด ๆ</strong>
+        และหวังว่าจะเป็นอีกหนึ่งความทรงจำดี ๆ ที่ผู้ปกครองและนักเรียนจะเก็บไว้ร่วมกันครับ
+      </p>
+      <p>
+        ขอให้คุณแม่และผู้ปกครองทุกท่านมีความสุข สุขภาพแข็งแรง
+        และได้รับพลังใจดี ๆ จากลูก ๆ ในทุก ๆ วันนะครับ 🙏🏻💙
+      </p>
+      <p class="parents-letter__sign">ม.บอล</p>
+      <div class="parents-letter__progress" aria-hidden="true">
+        <div class="parents-letter__progress-fill" id="parentsLetterProgress"></div>
+      </div>
+    </article>
+  </div>
+</div>
+
+<div class="parents-lightbox" id="parentsLightbox" hidden>
+  <button type="button" class="parents-lightbox__backdrop" id="parentsLightboxClose" aria-label="Close"></button>
+  <div class="parents-lightbox__panel" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button type="button" class="parents-lightbox__x" id="parentsLightboxX" aria-label="Close">×</button>
+    <div class="parents-lightbox__polaroid">
+      <img class="parents-lightbox__img" id="parentsLightboxImg" alt="Scrapbook photo">
+    </div>
+    <p class="parents-lightbox__hint">Esc to close</p>
+  </div>
+</div>
+
+<script src="/assets/scrapbook-photo.js"></script>
+</body>
+</html>
