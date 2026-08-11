@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seed postcards — pair photos by student ID</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="/assets/firebase-config.js"></script>
+<script src="/assets/postcard-seed-map.js"></script>
+<script type="module" src="/assets/firebase-postcard.js?v=7"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f4f1ea;
+    --ink: #141414;
+    --muted: #5c5c5c;
+    --line: #d9d2c6;
+    --ok: #1f7a3f;
+    --err: #a11b1b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Inter, system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at top left, #fff8e8, transparent 42%),
+      var(--bg);
+    padding: 32px 20px 64px;
+  }
+  main {
+    width: min(920px, 100%);
+    margin: 0 auto;
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-family: "Instrument Serif", Georgia, serif;
+    font-size: clamp(32px, 5vw, 44px);
+    font-weight: 400;
+  }
+  .lead {
+    margin: 0 0 24px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  button {
+    appearance: none;
+    border: 0;
+    border-radius: 999px;
+    background: #141414;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    padding: 12px 20px;
+    cursor: pointer;
+  }
+  button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  button.secondary {
+    background: #fff;
+    color: #141414;
+    border: 1px solid var(--line);
+  }
+  .status {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .status.is-error { color: var(--err); }
+  .status.is-ok { color: var(--ok); }
+  .table-wrap {
+    overflow: auto;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(255,255,255,0.72);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  th, td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: middle;
+  }
+  th {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: rgba(255,255,255,0.8);
+    position: sticky;
+    top: 0;
+  }
+  tr:last-child td { border-bottom: 0; }
+  .thumbs {
+    display: flex;
+    gap: 8px;
+  }
+  .thumbs img {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #ddd;
+  }
+  .mono { font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    background: #eee;
+  }
+  .pill.is-ok { background: #e5f6ea; color: var(--ok); }
+  .pill.is-err { background: #fdeaea; color: var(--err); }
+  .pill.is-wait { background: #f3efe6; color: #7a6540; }
+  .log {
+    margin-top: 16px;
+    white-space: pre-wrap;
+    font-size: 12px;
+    color: var(--muted);
+    max-height: 180px;
+    overflow: auto;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pair photos → student IDs</h1>
+  <p class="lead">
+    จับคู่เลขประจำตัวกับรูปอัตโนมัติ — ปกจาก <code>/image</code>, รูปในการ์ดจาก <code>/card</code>
+    ไม่ต้องพิมพ์ข้อความ ข้อความจะว่างไว้ ฟังก์ชันดูการ์ดเหมือนเดิม
+    <br>
+    <strong>สำคัญ:</strong> ต้องกดบันทึกให้สถานะเป็น <em>ok</em> จนครบ และ Firestore Rules ต้อง Publish แล้ว
+    จากนั้นค่อยไปค้นที่ <a href="/postcard-share-parents.html">/postcard-share-parents.html</a>
+  </p>
+
+  <div class="toolbar">
+    <button type="button" id="btnSeed">บันทึกการ์ดทั้งหมด</button>
+    <button type="button" class="secondary" id="btnStop" disabled>หยุด</button>
+    <span class="status" id="status">พร้อมจับคู่ 39 คน</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student ID</th>
+          <th>Cover /image</th>
+          <th>Inner /card</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <div class="log" id="log"></div>
+</main>
+
+<script type="module">
+const rowsEl = document.getElementById("rows");
+const statusEl = document.getElementById("status");
+const logEl = document.getElementById("log");
+const btnSeed = document.getElementById("btnSeed");
+const btnStop = document.getElementById("btnStop");
+
+const map = Array.isArray(window.POSTCARD_SEED_MAP) ? window.POSTCARD_SEED_MAP : [];
+let stopRequested = false;
+
+function log(msg) {
+  logEl.textContent += msg + "\n";
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function setStatus(text, kind) {
+  statusEl.textContent = text;
+  statusEl.className = "status" + (kind ? ` is-${kind}` : "");
+}
+
+function waitForFirebase(timeoutMs = 8000) {
+  const start = Date.now();
+  return new Promise((resolve, reject) => {
+    (function tick() {
+      if (window.FirebasePostcard && window.FirebasePostcard.isConfigured()) {
+        resolve(window.FirebasePostcard);
+        return;
+      }
+      if (Date.now() - start > timeoutMs) {
+        reject(new Error("Firebase is not ready"));
+        return;
+      }
+      setTimeout(tick, 50);
+    })();
+  });
+}
+
+function buildCardData(entry) {
+  const stickers = [null, null, null, null];
+  if (entry.inner) stickers[0] = entry.inner;
+  return {
+    titleLine1: "",
+    titleLine2: "",
+    from: "",
+    to: "",
+    message: "",
+    photo: entry.cover || null,
+    stickers,
+    stampFront: "/assets/mali.png",
+    stampFrontOpacity: 1,
+    stampBack: "/assets/mali.png",
+    stampBackOpacity: 1,
+    postageArt: "/assets/postage-stamp.png",
+    titleColor: "#f6eed8",
+  };
+}
+
+function renderRows() {
+  rowsEl.innerHTML = map
+    .map((entry, i) => {
+      const n = i + 1;
+      const inner = entry.inner
+        ? `<img src="${entry.inner}" alt="card ${n}">`
+        : `<span class="pill">missing</span>`;
+      return `<tr data-id="${entry.studentId}">
+        <td class="mono">${n}</td>
+        <td class="mono">${entry.studentId}</td>
+        <td><div class="thumbs"><img src="${entry.cover}" alt="cover ${n}"></div></td>
+        <td><div class="thumbs">${inner}</div></td>
+        <td><span class="pill is-wait" data-status>รอ</span></td>
+      </tr>`;
+    })
+    .join("");
+}
+
+function setRowStatus(studentId, text, kind) {
+  const row = rowsEl.querySelector(`tr[data-id="${studentId}"] [data-status]`);
+  if (!row) return;
+  row.textContent = text;
+  row.className = "pill" + (kind ? ` is-${kind}` : "");
+}
+
+async function seedAll() {
+  stopRequested = false;
+  btnSeed.disabled = true;
+  btnStop.disabled = false;
+  setStatus("กำลังบันทึก...", null);
+  log("— start seed —");
+
+  try {
+    const api = await waitForFirebase();
+    let ok = 0;
+    let fail = 0;
+
+    for (let i = 0; i < map.length; i++) {
+      if (stopRequested) {
+        setStatus(`หยุดแล้ว · สำเร็จ ${ok} · ไม่สำเร็จ ${fail}`, "error");
+        log("stopped by user");
+        break;
+      }
+
+      const entry = map[i];
+      setRowStatus(entry.studentId, "saving…", "wait");
+      setStatus(`บันทึก ${i + 1}/${map.length}: ${entry.studentId}`, null);
+
+      try {
+        await api.savePostcard({
+          studentId: entry.studentId,
+          style: "vintage",
+          data: buildCardData(entry),
+          photoBlob: null,
+        });
+        ok += 1;
+        setRowStatus(entry.studentId, "ok", "ok");
+        log(`ok ${entry.studentId}`);
+      } catch (err) {
+        fail += 1;
+        const msg = (err && err.message) || String(err);
+        setRowStatus(entry.studentId, "error", "err");
+        log(`fail ${entry.studentId}: ${msg}`);
+      }
+    }
+
+    if (!stopRequested) {
+      setStatus(`เสร็จแล้ว · สำเร็จ ${ok} · ไม่สำเร็จ ${fail}`, fail ? "error" : "ok");
+      log(`— done ok=${ok} fail=${fail} —`);
+    }
+  } catch (err) {
+    const msg = (err && err.message) || String(err);
+    setStatus(msg, "error");
+    log(msg);
+  } finally {
+    btnSeed.disabled = false;
+    btnStop.disabled = true;
+  }
+}
+
+btnSeed.addEventListener("click", seedAll);
+btnStop.addEventListener("click", () => {
+  stopRequested = true;
+  btnStop.disabled = true;
+});
+
+renderRows();
+</script>
+</body>
+</html>

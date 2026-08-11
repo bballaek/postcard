@@ -187,6 +187,24 @@ function normalizeLetterSpace(text) {
   return String(text || "").replace(/\s+/g, " ").trim();
 }
 
+function segmentGraphemes(text) {
+  const value = String(text || "");
+  if (typeof Intl !== "undefined" && typeof Intl.Segmenter === "function") {
+    const segmenter = new Intl.Segmenter("th", { granularity: "grapheme" });
+    return Array.from(segmenter.segment(value), (part) => part.segment);
+  }
+  return Array.from(value);
+}
+
+function appendGrapheme(parent, grapheme) {
+  const last = parent.lastChild;
+  if (last && last.nodeType === Node.TEXT_NODE) {
+    last.data += grapheme;
+    return;
+  }
+  parent.appendChild(document.createTextNode(grapheme));
+}
+
 function captureLetterScript() {
   if (!letterBody || letterBody.dataset.scriptReady === "1") return;
   const nodes = letterBody.querySelectorAll(
@@ -201,12 +219,23 @@ function captureLetterScript() {
 function countTypeChars(html) {
   const tmp = document.createElement("div");
   tmp.innerHTML = html;
-  return normalizeLetterSpace(tmp.textContent).length;
+  return segmentGraphemes(normalizeLetterSpace(tmp.textContent)).length;
 }
 
 function setLetterProgress(ratio) {
   if (!letterProgress) return;
   letterProgress.style.width = `${Math.max(0, Math.min(1, ratio)) * 100}%`;
+}
+
+async function typeText(parent, text, onChar) {
+  const parts = segmentGraphemes(text);
+  for (const part of parts) {
+    if (part === "\n") continue;
+    appendGrapheme(parent, part);
+    if (typeof onChar === "function") onChar(part);
+    if (/^\s+$/.test(part)) await wait(TYPE_MS * 0.35);
+    else await wait(TYPE_MS);
+  }
 }
 
 async function typeInto(el, html, onChar) {
@@ -218,14 +247,7 @@ async function typeInto(el, html, onChar) {
   const nodes = Array.from(source.childNodes);
   for (const node of nodes) {
     if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.textContent || "";
-      for (const ch of text) {
-        if (ch === "\n") continue;
-        el.appendChild(document.createTextNode(ch));
-        if (typeof onChar === "function") onChar(ch);
-        if (!/\s/.test(ch)) await wait(TYPE_MS);
-        else await wait(TYPE_MS * 0.35);
-      }
+      await typeText(el, node.textContent || "", onChar);
       continue;
     }
 
@@ -238,12 +260,7 @@ async function typeInto(el, html, onChar) {
       if (tag === "strong" || tag === "em" || tag === "b" || tag === "i") {
         const wrap = document.createElement(tag);
         el.appendChild(wrap);
-        const text = normalizeLetterSpace(node.textContent);
-        for (const ch of text) {
-          wrap.appendChild(document.createTextNode(ch));
-          if (typeof onChar === "function") onChar(ch);
-          await wait(TYPE_MS);
-        }
+        await typeText(wrap, normalizeLetterSpace(node.textContent), onChar);
         continue;
       }
       el.appendChild(node.cloneNode(true));
@@ -289,7 +306,7 @@ async function playLetterTypewriter() {
 }
 
 async function showExhibition() {
-  if (!page || !exhibition || !exhibitionFrame) return;
+  if (!page || !exhibition || !exhibitionFrame) return null;
 
   if (search && !search.hidden) {
     await hideSearch();
@@ -304,13 +321,15 @@ async function showExhibition() {
   exhibition.classList.add("is-visible");
   exhibitionFrame.src = "/parents-exhibition";
 
-  await new Promise((resolve) => {
+  const result = await new Promise((resolve) => {
     function onMessage(event) {
       if (event.origin !== window.location.origin) return;
       const data = event.data;
-      if (!data || data.type !== "parents-exhibition-next") return;
-      window.removeEventListener("message", onMessage);
-      resolve();
+      if (!data || typeof data !== "object") return;
+      if (data.type === "parents-exhibition-next") {
+        window.removeEventListener("message", onMessage);
+        resolve({ mode: "next" });
+      }
     }
     window.addEventListener("message", onMessage);
   });
@@ -320,6 +339,7 @@ async function showExhibition() {
   exhibition.hidden = true;
   exhibitionFrame.removeAttribute("src");
   page.classList.remove("is-exhibition");
+  return result;
 }
 
 async function showLetter() {
@@ -350,11 +370,8 @@ async function showLetter() {
   page.classList.remove("is-letter");
 }
 
-async function showResult() {
+async function revealCard() {
   if (!page) return;
-
-  await showExhibition();
-  await showLetter();
 
   page.classList.remove("is-search", "is-loading", "is-letter", "is-exhibition");
   page.classList.add("is-result");
@@ -381,6 +398,34 @@ async function showResult() {
 
   await wait(40);
   if (cardSlot) cardSlot.classList.add("is-visible");
+}
+
+async function loadCardForStudent(rawId) {
+  const api = await waitForFirebase(8000);
+  const postcard = await api.getPostcard(rawId);
+  if (!postcard || !postcard.data) {
+    throw new Error(
+      "ยังไม่พบการ์ดของเลขนี้ — ไปที่ /postcard-seed.html กดบันทึกการ์ดทั้งหมดก่อน แล้วลองใหม่",
+    );
+  }
+  const style = postcard.style || "vintage";
+  applyTheme(style);
+  await renderCard(style, postcard.data);
+}
+
+async function showResult() {
+  if (!page) return;
+
+  await showExhibition();
+  // Teacher letter step hidden for this event.
+  // Always show the card for the student ID entered at search.
+  await revealCard();
+}
+
+async function lookupStudent(rawId) {
+  setError("");
+  await loadCardForStudent(rawId);
+  await showResult();
 }
 
 function setLoading(loading) {
@@ -440,12 +485,7 @@ async function renderCard(style, data) {
   if (!window.PostcardCard || !window.PostcardCard.toDataURL) {
     throw new Error("Postcard renderer failed to load.");
   }
-  const [front, back] = await Promise.all([
-    window.PostcardCard.toDataURL(style, "front", data, 2),
-    window.PostcardCard.toDataURL(style, "back", data, 2),
-  ]);
-  frontUrl = front;
-  backUrl = back;
+  const front = await window.PostcardCard.toDataURL(style, "front", data, 2);
   scrapbookPhotoUrl =
     (data && data.stickers && data.stickers[0]) ||
     (data && data.backPhoto) ||
@@ -454,6 +494,12 @@ async function renderCard(style, data) {
     scrapbookPhotoUrl ||
     (data && data.photo) ||
     "";
+
+  // Back face: only the /card photo as a vertical photo card (no stamp chrome).
+  const backPhotoOnly = scrapbookPhotoUrl || (data && data.photo) || "";
+  frontUrl = front;
+  backUrl = backPhotoOnly || front;
+
   if (frontImg) {
     frontImg.removeAttribute("src");
     frontImg.src = front;
@@ -461,10 +507,22 @@ async function renderCard(style, data) {
   }
   if (backImg) {
     backImg.removeAttribute("src");
-    backImg.src = back;
-    backImg.alt = "Postcard back";
+    if (backPhotoOnly) {
+      backImg.src = backPhotoOnly;
+      backImg.alt = "Family photo card";
+    } else {
+      // Fallback: render classic back if no card photo exists.
+      const back = await window.PostcardCard.toDataURL(style, "back", data, 2);
+      backUrl = back;
+      backImg.src = back;
+      backImg.alt = "Postcard back";
+    }
   }
-  await waitForImages([front, back, envelope && envelope.src]);
+  await waitForImages([
+    front,
+    backImg && backImg.src,
+    envelope && envelope.src,
+  ]);
 }
 
 function openScrapbookPhoto() {
@@ -503,8 +561,8 @@ function onPreviewActivate(e) {
     e.preventDefault();
     e.stopPropagation();
   }
-  // On the back side, open the scrapbook polaroid photo.
-  // On the front side (or if no photo), flip like the share page.
+  // On the back side, open the photo larger.
+  // On the front side, flip to the vertical photo card.
   if (flipped && scrapbookPhotoUrl) {
     openScrapbookPhoto();
     return;
@@ -527,20 +585,6 @@ function waitForFirebase(timeoutMs) {
       setTimeout(tick, 50);
     })();
   });
-}
-
-async function lookupStudent(rawId) {
-  setError("");
-  const api = await waitForFirebase(8000);
-  const postcard = await api.getPostcard(rawId);
-  if (!postcard || !postcard.data) {
-    throw new Error("Could not find a postcard for that student ID.");
-  }
-
-  const style = postcard.style || "vintage";
-  applyTheme(style);
-  await renderCard(style, postcard.data);
-  await showResult();
 }
 
 function wireOtp() {

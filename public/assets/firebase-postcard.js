@@ -4,15 +4,21 @@
  *
  * Photos prefer Firebase Storage. If Storage is not enabled yet,
  * images fall back to compressed data URLs inside Firestore.
+ *
+ * Card payload is stored as `dataJson` (string) to avoid Firestore
+ * "Property data contains an invalid nested entity" on some projects.
  */
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import {
   initializeFirestore,
   getFirestore,
   doc,
+  getDoc,
   getDocFromServer,
   setDoc,
   serverTimestamp,
+  waitForPendingWrites,
+  memoryLocalCache,
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 import {
   getStorage,
@@ -24,12 +30,29 @@ import {
 let dbInstance = null;
 let storageDisabled = false;
 
-const MAX_EDGE = 1400;
-const JPEG_QUALITY = 0.75;
-const FALLBACK_EDGE = 900;
-const FALLBACK_QUALITY = 0.62;
+const MAX_EDGE = 1200;
+const JPEG_QUALITY = 0.72;
+const FALLBACK_EDGE = 720;
+const FALLBACK_QUALITY = 0.58;
 const UPLOAD_TIMEOUT_MS = 40000;
-const MAX_DATA_URL_CHARS = 700000; // keep Firestore doc under ~1MB
+const MAX_DATA_URL_CHARS = 450000;
+
+const CARD_KEYS = [
+  "titleLine1",
+  "titleLine2",
+  "from",
+  "to",
+  "message",
+  "photo",
+  "stickers",
+  "stampFront",
+  "stampFrontOpacity",
+  "stampBack",
+  "stampBackOpacity",
+  "postageArt",
+  "titleColor",
+  "backPhoto",
+];
 
 function getConfig() {
   const cfg = window.FIREBASE_CONFIG;
@@ -52,6 +75,7 @@ function getDb() {
   try {
     dbInstance = initializeFirestore(app, {
       experimentalForceLongPolling: true,
+      localCache: memoryLocalCache(),
     });
   } catch (err) {
     dbInstance = getFirestore(app);
@@ -124,6 +148,7 @@ function isStorageSetupError(err) {
     code === "permission-denied" ||
     /storage\//i.test(String(code || "")) ||
     /Firebase Storage has not been set up/i.test(msg) ||
+    /bucket does not exist/i.test(msg) ||
     /permission/i.test(msg)
   );
 }
@@ -141,16 +166,50 @@ function friendlyFirebaseError(err) {
   ) {
     return new Error("เชื่อมต่อ Firebase ไม่ได้ — ตรวจเน็ตแล้วลองใหม่");
   }
-  if (code === "permission-denied" || /permission/i.test(msg)) {
+  if (code === "permission-denied" || (/permission/i.test(msg) && !/storage/i.test(msg))) {
     return new Error(
-      "Firestore ยังไม่อนุญาตบันทึก — ไป Firestore → Rules แล้ว Publish:\n\nrules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /postcards/{studentId} {\n      allow read, write: if true;\n    }\n  }\n}",
+      "Firestore ยังไม่อนุญาตบันทึก — ไป Firestore → Rules แล้ว Publish rules ที่อนุญาต read/write สำหรับ postcards",
     );
+  }
+  if (/invalid nested entity/i.test(msg)) {
+    return new Error(
+      "รูปแบบข้อมูลการ์ดไม่ถูกรับโดย Firestore — รีเฟรชหน้าแล้วลองบันทึกใหม่ (อัปเดตตัวบันทึกแล้ว)",
+    );
+  }
+  if (/exceeds the maximum|too big|too large/i.test(msg)) {
+    return new Error("รูปใหญ่เกินไป — ลองเลือกรูปที่เล็กกว่า หรือเปิด Firebase Storage");
   }
   return err instanceof Error ? err : new Error(msg || "Firebase request failed");
 }
 
+function pickCardData(input) {
+  const src = input && typeof input === "object" ? input : {};
+  const out = {};
+  CARD_KEYS.forEach((key) => {
+    if (src[key] !== undefined) out[key] = src[key];
+  });
+  return out;
+}
+
+function toPlainJson(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function normalizeMediaValue(value) {
+  if (value == null || value === "") return null;
+  if (typeof value === "string") return value;
+  return null;
+}
+
+function normalizeStickers(list) {
+  const arr = Array.isArray(list) ? list.slice(0, 4) : [];
+  while (arr.length < 4) arr.push(null);
+  return arr.map((item) => normalizeMediaValue(item));
+}
+
 async function blobFromSrc(src) {
   if (!src) return null;
+  if (src instanceof Blob) return src;
   if (typeof src !== "string") return null;
   if (src.startsWith("blob:") || src.startsWith("data:")) {
     const res = await fetch(src);
@@ -205,16 +264,17 @@ async function toFallbackDataUrl(blob) {
   let edge = FALLBACK_EDGE;
   let quality = FALLBACK_QUALITY;
 
-  // Shrink until it fits Firestore-ish budget.
-  while (dataUrl.length > MAX_DATA_URL_CHARS && (edge > 400 || quality > 0.4)) {
-    edge = Math.max(400, Math.round(edge * 0.8));
-    quality = Math.max(0.4, quality - 0.08);
+  while (dataUrl.length > MAX_DATA_URL_CHARS && (edge > 320 || quality > 0.35)) {
+    edge = Math.max(320, Math.round(edge * 0.78));
+    quality = Math.max(0.35, quality - 0.08);
     current = await compressImageBlob(blob, edge, quality);
     dataUrl = await blobToDataUrl(current);
   }
 
   if (dataUrl.length > MAX_DATA_URL_CHARS) {
-    throw new Error("รูปใหญ่เกินไปสำหรับบันทึกแบบสำรอง — ลองเลือกรูปที่เล็กกว่า");
+    throw new Error(
+      "รูปใหญ่เกินไป และยังเปิด Firebase Storage ไม่ได้ — เปิด Storage ใน Console แล้วลองใหม่",
+    );
   }
   return dataUrl;
 }
@@ -234,10 +294,16 @@ async function uploadToStorage(blob, studentId, contentType) {
 
 async function uploadImage(src, studentId) {
   if (!src) return null;
+
+  // Keep packaged / static site assets as relative paths — no need to upload.
   if (typeof src === "string") {
     if (src.startsWith("http://") || src.startsWith("https://")) return src;
-    if (src.startsWith("data:image/")) return src;
-    if (src.startsWith("/assets/") || src.startsWith("assets/")) {
+    if (
+      src.startsWith("/assets/") ||
+      src.startsWith("assets/") ||
+      src.startsWith("/image/") ||
+      src.startsWith("/card/")
+    ) {
       return src.startsWith("/") ? src : `/${src}`;
     }
   }
@@ -256,12 +322,11 @@ async function uploadImage(src, studentId) {
     try {
       return await uploadToStorage(blob, studentId, contentType);
     } catch (err) {
-      console.warn("[FirebasePostcard] Storage upload failed, using Firestore data URL fallback", err);
-      if (isStorageSetupError(err)) {
-        storageDisabled = true;
-      } else {
-        // Still try fallback for transient storage issues.
-      }
+      console.warn(
+        "[FirebasePostcard] Storage upload failed, using Firestore data URL fallback",
+        err,
+      );
+      if (isStorageSetupError(err)) storageDisabled = true;
     }
   }
 
@@ -269,53 +334,77 @@ async function uploadImage(src, studentId) {
 }
 
 async function hydrateDataMedia(data, studentId) {
-  const next = { ...(data || {}) };
-  const tasks = [];
+  const next = pickCardData(data);
 
   if (next.photo) {
-    tasks.push(
-      uploadImage(next.photo, studentId).then((url) => {
-        next.photo = url;
-      }),
-    );
+    next.photo = await uploadImage(next.photo, studentId);
   }
 
   if (Array.isArray(next.stickers)) {
-    tasks.push(
-      Promise.all(
-        next.stickers.map((s) => (s ? uploadImage(s, studentId) : null)),
-      ).then((list) => {
-        next.stickers = list;
-        while (next.stickers.length < 4) next.stickers.push(null);
-      }),
+    const list = await Promise.all(
+      next.stickers.map((s) => (s ? uploadImage(s, studentId) : null)),
     );
+    next.stickers = normalizeStickers(list);
+  } else {
+    next.stickers = normalizeStickers([]);
   }
 
-  // Asset paths (/assets/...) are kept as-is inside uploadImage.
+  if (next.backPhoto) {
+    next.backPhoto = await uploadImage(next.backPhoto, studentId);
+  }
   if (next.postageArt) {
-    tasks.push(
-      uploadImage(next.postageArt, studentId).then((url) => {
-        next.postageArt = url;
-      }),
-    );
+    next.postageArt = await uploadImage(next.postageArt, studentId);
   }
   if (next.stampFront) {
-    tasks.push(
-      uploadImage(next.stampFront, studentId).then((url) => {
-        next.stampFront = url;
-      }),
-    );
+    next.stampFront = await uploadImage(next.stampFront, studentId);
   }
   if (next.stampBack) {
-    tasks.push(
-      uploadImage(next.stampBack, studentId).then((url) => {
-        next.stampBack = url;
-      }),
-    );
+    next.stampBack = await uploadImage(next.stampBack, studentId);
   }
 
-  await Promise.all(tasks);
-  return next;
+  next.photo = normalizeMediaValue(next.photo);
+  next.backPhoto = normalizeMediaValue(next.backPhoto);
+  next.postageArt = normalizeMediaValue(next.postageArt);
+  next.stampFront = normalizeMediaValue(next.stampFront);
+  next.stampBack = normalizeMediaValue(next.stampBack);
+
+  if (typeof next.stampFrontOpacity !== "number") next.stampFrontOpacity = 1;
+  if (typeof next.stampBackOpacity !== "number") next.stampBackOpacity = 1;
+  if (typeof next.titleLine1 !== "string") next.titleLine1 = "";
+  if (typeof next.titleLine2 !== "string") next.titleLine2 = "";
+  if (typeof next.from !== "string") next.from = "";
+  if (typeof next.to !== "string") next.to = "";
+  if (typeof next.message !== "string") next.message = "";
+  if (typeof next.titleColor !== "string") next.titleColor = "#0c0c0c";
+
+  return toPlainJson(next);
+}
+
+function parseDocToPostcard(raw) {
+  if (!raw || typeof raw !== "object") return null;
+
+  let data = null;
+  if (typeof raw.dataJson === "string" && raw.dataJson) {
+    try {
+      data = JSON.parse(raw.dataJson);
+    } catch (err) {
+      console.warn("[FirebasePostcard] bad dataJson", err);
+    }
+  }
+  if (!data && raw.data && typeof raw.data === "object" && !Array.isArray(raw.data)) {
+    data = raw.data;
+  }
+  if (!data) {
+    data = pickCardData(raw);
+  }
+
+  return {
+    studentId: raw.studentId || null,
+    style: raw.style || "vintage",
+    data,
+    updatedAt: raw.updatedAt || null,
+    createdAt: raw.createdAt || null,
+  };
 }
 
 async function savePostcard({ studentId, style, data, photoBlob }) {
@@ -323,21 +412,34 @@ async function savePostcard({ studentId, style, data, photoBlob }) {
   if (!id) throw new Error("Please enter your student ID");
 
   try {
-    const payload = { ...(data || {}) };
+    const payload = pickCardData(data || {});
+
     if (photoBlob instanceof Blob) {
       payload.photo = await uploadImage(photoBlob, id);
+    } else if (payload.photo) {
+      payload.photo = await uploadImage(payload.photo, id);
     }
 
     const hydrated = await hydrateDataMedia(payload, id);
-    const refDoc = doc(getDb(), "postcards", id);
+    const dataJson = JSON.stringify(hydrated);
+    if (dataJson.length > 900000) {
+      throw new Error(
+        "ข้อมูลการ์ดใหญ่เกินไป — เปิด Firebase Storage ใน Console แล้วลองใหม่",
+      );
+    }
 
+    const db = getDb();
+    const refDoc = doc(db, "postcards", id);
+
+    // Store card as JSON string (avoids nested-entity errors on `data`).
     await withTimeout(
       setDoc(
         refDoc,
         {
           studentId: String(studentId).trim(),
           style: style || "vintage",
-          data: hydrated,
+          dataJson,
+          photo: hydrated.photo || null,
           updatedAt: serverTimestamp(),
           createdAt: serverTimestamp(),
         },
@@ -347,7 +449,20 @@ async function savePostcard({ studentId, style, data, photoBlob }) {
       "Saving postcard",
     );
 
-    return { studentId: id, data: hydrated };
+    // Make sure the write reached the server (not only a local cache).
+    await withTimeout(waitForPendingWrites(db), 20000, "Syncing postcard");
+    const verify = await withTimeout(
+      getDocFromServer(refDoc),
+      20000,
+      "Verifying postcard",
+    );
+    if (!verify.exists()) {
+      throw new Error(
+        "บันทึกไม่ขึ้นเซิร์ฟเวอร์ — ตรวจ Firestore Rules แล้ว Publish (allow read, write: if true)",
+      );
+    }
+
+    return { studentId: id, style: style || "vintage", data: hydrated };
   } catch (err) {
     console.error("[FirebasePostcard] save failed", err);
     throw friendlyFirebaseError(err);
@@ -358,13 +473,21 @@ async function getPostcard(studentId) {
   const id = normalizeStudentId(studentId);
   if (!id) return null;
   try {
-    const snap = await withTimeout(
-      getDocFromServer(doc(getDb(), "postcards", id)),
-      20000,
-      "Loading postcard",
-    );
+    const refDoc = doc(getDb(), "postcards", id);
+    let snap;
+    try {
+      snap = await withTimeout(
+        getDocFromServer(refDoc),
+        20000,
+        "Loading postcard",
+      );
+    } catch (err) {
+      // Fall back to cache/local if server read fails (offline / rules blip).
+      console.warn("[FirebasePostcard] getDocFromServer failed, trying getDoc", err);
+      snap = await withTimeout(getDoc(refDoc), 20000, "Loading postcard");
+    }
     if (!snap.exists()) return null;
-    return snap.data();
+    return parseDocToPostcard(snap.data());
   } catch (err) {
     throw friendlyFirebaseError(err);
   }

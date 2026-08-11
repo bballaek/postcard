@@ -1,0 +1,48 @@
+/** Student ID → prepared photos (sorted by student ID). */
+export type PostcardSeedEntry = {
+  studentId: string;
+  cover: string;
+  inner: string | null;
+};
+
+export const POSTCARD_SEED_MAP: PostcardSeedEntry[] = [
+  { studentId: "38423", cover: "/image/1.jpg", inner: "/card/1.jpg" },
+  { studentId: "38440", cover: "/image/2.jpg", inner: "/card/2.jpg" },
+  { studentId: "38454", cover: "/image/3.jpg", inner: "/card/3.jpg" },
+  { studentId: "38482", cover: "/image/4.jpg", inner: "/card/4.jpg" },
+  { studentId: "38494", cover: "/image/5.jpg", inner: "/card/5.jpg" },
+  { studentId: "38522", cover: "/image/6.jpg", inner: "/card/6.jpg" },
+  { studentId: "38533", cover: "/image/7.jpg", inner: "/card/7.jpg" },
+  { studentId: "38536", cover: "/image/8.jpg", inner: "/card/8.jpg" },
+  { studentId: "38542", cover: "/image/9.jpg", inner: "/card/9.jpg" },
+  { studentId: "38572", cover: "/image/10.jpg", inner: "/card/10.jpg" },
+  { studentId: "38649", cover: "/image/11.jpg", inner: "/card/11.jpg" },
+  { studentId: "38674", cover: "/image/12.jpg", inner: "/card/12.jpg" },
+  { studentId: "38682", cover: "/image/13.jpg", inner: "/card/13.jpg" },
+  { studentId: "38684", cover: "/image/14.jpg", inner: "/card/14.jpg" },
+  { studentId: "38689", cover: "/image/15.jpg", inner: "/card/15.jpg" },
+  { studentId: "38712", cover: "/image/16.jpg", inner: "/card/16.jpg" },
+  { studentId: "38728", cover: "/image/17.jpg", inner: "/card/17.jpg" },
+  { studentId: "38732", cover: "/image/18.jpg", inner: "/card/18.jpg" },
+  { studentId: "38752", cover: "/image/19.jpg", inner: "/card/19.jpg" },
+  { studentId: "38755", cover: "/image/20.jpg", inner: "/card/20.jpg" },
+  { studentId: "38763", cover: "/image/21.jpg", inner: "/card/21.jpg" },
+  { studentId: "38767", cover: "/image/22.jpg", inner: "/card/22.jpg" },
+  { studentId: "38790", cover: "/image/23.jpg", inner: "/card/23.jpg" },
+  { studentId: "38819", cover: "/image/24.jpg", inner: "/card/24.jpg" },
+  { studentId: "38831", cover: "/image/25.jpg", inner: "/card/25.jpg" },
+  { studentId: "38843", cover: "/image/26.jpg", inner: "/card/26.jpg" },
+  { studentId: "38844", cover: "/image/27.jpg", inner: "/card/27.jpg" },
+  { studentId: "38849", cover: "/image/28.jpg", inner: null },
+  { studentId: "38857", cover: "/image/29.jpg", inner: "/card/29.jpg" },
+  { studentId: "38933", cover: "/image/30.jpg", inner: "/card/30.jpg" },
+  { studentId: "42409", cover: "/image/31.jpg", inner: "/card/31.jpg" },
+  { studentId: "42413", cover: "/image/32.jpg", inner: "/card/32.jpg" },
+  { studentId: "42420", cover: "/image/33.jpg", inner: "/card/33.jpg" },
+  { studentId: "42427", cover: "/image/34.jpg", inner: "/card/34.jpg" },
+  { studentId: "42435", cover: "/image/35.jpg", inner: "/card/35.jpg" },
+  { studentId: "42441", cover: "/image/36.jpg", inner: "/card/36.jpg" },
+  { studentId: "42450", cover: "/image/37.jpg", inner: "/card/37.jpg" },
+  { studentId: "42456", cover: "/image/38.jpg", inner: "/card/38.jpg" },
+  { studentId: "42713", cover: "/image/39.jpg", inner: "/card/39.jpg" },
+];

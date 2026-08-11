@@ -11,6 +11,7 @@ declare module "@/exhibition-lab/src/ExhibitionLab" {
     logoSrc?: string;
     maxTiles?: number;
     hideChrome?: boolean;
+    onFocusChange?: (index: number | null) => void;
   };
 
   const ExhibitionLab: ComponentType<ExhibitionLabProps>;

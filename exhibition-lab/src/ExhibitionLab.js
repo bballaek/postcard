@@ -151,6 +151,7 @@ const ExhibitionLab = ({
   logoSrc = "/logo/logoSceneLapse-Green.svg",
   maxTiles = MAX_TILES,
   hideChrome = false,
+  onFocusChange = null,
 } = {}) => {
   const mountRef = useRef(null);
   const apiRef = useRef(null);
@@ -168,6 +169,10 @@ const ExhibitionLab = ({
   const [sideVisible, setSideVisible] = useState(false);
   const [draggingUi, setDraggingUi] = useState(false);
   const [centerVisible, setCenterVisible] = useState(false);
+
+  useEffect(() => {
+    if (typeof onFocusChange === "function") onFocusChange(focusIndex);
+  }, [focusIndex, onFocusChange]);
 
   const urlList = useMemo(
     () => uniqueUrls(urls).slice(0, tileLimit),

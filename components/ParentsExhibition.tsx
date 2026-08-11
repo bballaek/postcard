@@ -2,11 +2,9 @@
 
 import ExhibitionLab from "@/exhibition-lab/src/ExhibitionLab";
 import { stopExlabAmbient } from "@/exhibition-lab/src/exlabSound";
+import { POSTCARD_SEED_MAP } from "@/lib/postcard-seed-map";
 
-const PHOTO_URLS = Array.from(
-  { length: 39 },
-  (_, i) => `/image/${i + 1}.jpg`,
-);
+const PHOTO_URLS = POSTCARD_SEED_MAP.map((entry) => entry.cover);
 
 function notifyDone() {
   try {
@@ -46,7 +44,7 @@ export default function ParentsExhibition() {
         className="parents-exhibition-next"
         onClick={notifyDone}
       >
-        ถัดไป
+        Next
       </button>
     </div>
   );

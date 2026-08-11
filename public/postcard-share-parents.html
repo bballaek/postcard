@@ -17,10 +17,10 @@
 <link rel="stylesheet" href="/assets/postcard-card-CqVokCik.css">
 <link rel="stylesheet" href="/assets/mobile-responsive-Dfoc304p.css">
 <link rel="stylesheet" href="/assets/scrapbook-photo.css">
-<link rel="stylesheet" href="/assets/parents-share.css?v=10">
+<link rel="stylesheet" href="/assets/parents-share.css?v=18">
 <script src="/assets/firebase-config.js"></script>
-<script type="module" src="/assets/firebase-postcard.js?v=3"></script>
-<script type="module" src="/assets/parents-share.js?v=11"></script>
+<script type="module" src="/assets/firebase-postcard.js?v=7"></script>
+<script type="module" src="/assets/parents-share.js?v=17"></script>
 </head>
 <body>
 <div class="share-sheet frame-sheet" id="shareSheet" aria-hidden="true">
@@ -75,7 +75,15 @@
         >
           <div class="preview-compose">
             <img class="share-envelope" id="parentsEnvelope" src="/assets/envelope-72W9nEuG.png" alt="">
-            <img class="share-card-back" id="shareCardBack" src="" alt="">
+            <div class="parents-back-card" id="parentsBackCard">
+              <img
+                class="parents-back-card__paper"
+                src="/assets/3.png"
+                alt=""
+                aria-hidden="true"
+              >
+              <img class="share-card-back" id="shareCardBack" src="" alt="">
+            </div>
             <img class="share-card-front" id="shareCardFront" src="" alt="Your postcard preview">
           </div>
         </div>
@@ -92,7 +100,7 @@
     </div>
   </div>
 
-  <div class="parents-letter" id="parentsLetter" hidden>
+  <div class="parents-letter" id="parentsLetter" hidden aria-hidden="true" style="display:none">
     <article class="parents-letter__card">
       <div class="parents-letter__stage">
         <img
