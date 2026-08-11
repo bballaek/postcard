@@ -1,0 +1,389 @@
+/* Creative Space Lab — full experience: intro + floating collage + chrome */
+
+.exlab {
+  --cs-app-h: 100dvh;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  width: 100%;
+  height: var(--cs-app-h, 100dvh);
+  overflow: hidden;
+  background: #f2f2f2;
+  color: #141414;
+  font-family: "IBM Plex Sans", "Geist", system-ui, sans-serif;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+
+.exlab.is-dragging {
+  cursor: grabbing;
+}
+
+.exlab.phase-loading,
+.exlab.phase-intro {
+  cursor: default;
+}
+
+.exlab-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.exlab-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.exlab-stage canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+
+/* —— Top chrome —— */
+.exlab-chrome-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.85rem 1rem;
+  pointer-events: none;
+}
+
+.exlab-brand {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 31;
+  pointer-events: auto;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #141414;
+  text-decoration: none;
+  font-family: "IBM Plex Serif", "Times New Roman", serif;
+}
+
+.exlab-pills {
+  display: flex;
+  align-items: stretch;
+  gap: 0.28rem;
+  pointer-events: auto;
+}
+
+.exlab-pill {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-width: 1.85rem;
+  padding: 0.38rem 0.55rem 0.32rem 0.65rem;
+  border-radius: 0.28rem;
+  background: rgb(230 230 230 / 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  cursor: pointer;
+  border: 0;
+  font: inherit;
+}
+
+.exlab-pill-num {
+  padding-inline: 0.55rem;
+  align-items: center;
+}
+
+.exlab-pill-num .exlab-pill-label {
+  font-style: normal;
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.exlab-pill-label {
+  font-size: 0.88rem;
+  line-height: 1.1;
+  white-space: nowrap;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.exlab-pill.is-active .exlab-pill-label {
+  opacity: 1;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.exlab-pill.is-active {
+  background: rgb(220 220 220 / 0.9);
+}
+
+.exlab-pill sup {
+  font-size: 0.62rem;
+  line-height: 1.35;
+  margin-left: 0.12rem;
+  transform: translateY(0.08rem);
+  opacity: 0.55;
+  font-style: normal;
+}
+
+.exlab-sound {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  z-index: 31;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exlab-sound-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #141414;
+  transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1),
+    box-shadow 0.45s ease;
+}
+
+.exlab-sound.is-on .exlab-sound-dot {
+  transform: scale(1.4);
+  box-shadow: 0 0 0 4px rgb(20 20 20 / 0.18);
+}
+
+/* —— Center mark (intro only) —— */
+.exlab-center-mark {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.65s ease;
+}
+
+.exlab-center-mark.is-visible {
+  opacity: 1;
+}
+
+.exlab-center-mark img {
+  height: clamp(2.5rem, 6.5vw, 3.9rem);
+  width: auto;
+}
+
+/* —— Side words (ready) —— */
+.exlab-side {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 8%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.exlab-side-left,
+.exlab-side-right {
+  display: flex;
+  gap: 0.35em;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.exlab-side-right {
+  font-style: italic;
+  opacity: 0.88;
+}
+
+.exlab-side-word {
+  display: inline-block;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+.exlab.is-side-on .exlab-side-word {
+  animation: exlab-rise 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.exlab.is-side-on .exlab-side-left .exlab-side-word {
+  animation-delay: 90ms;
+}
+
+.exlab.is-side-on .exlab-side-right .exlab-side-word:nth-child(1) {
+  animation-delay: 150ms;
+}
+
+.exlab.is-side-on .exlab-side-right .exlab-side-word:nth-child(2) {
+  animation-delay: 210ms;
+}
+
+@keyframes exlab-rise {
+  from {
+    opacity: 0;
+    transform: translateY(110%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.exlab-edge {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 70% 58% at 50% 48%,
+    transparent 40%,
+    rgb(242 242 242 / 0.35) 72%,
+    #f2f2f2 100%
+  );
+}
+
+/* —— Bottom chrome —— */
+.exlab-chrome-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1rem 1.25rem calc(1.1rem + env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+
+.exlab-counter {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+  font-style: italic;
+}
+
+/* Focus / orbit index — slide up inside overflow clip (GN-style) */
+.exlab-index-wrap {
+  position: relative;
+  overflow: hidden;
+  height: 1.15em;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.exlab-index-num {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  font-style: italic;
+  will-change: transform;
+  animation: exlab-index-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.exlab-index-num.is-idle {
+  animation: none;
+  opacity: 0.55;
+}
+
+@keyframes exlab-index-up {
+  from {
+    transform: translateY(110%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.exlab-overview {
+  pointer-events: auto;
+  margin: 0.35rem 0 0;
+  padding: 0.3rem 0.75rem;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #141414;
+  opacity: 0.7;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.exlab-hint {
+  margin: 0;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.32;
+}
+
+.exlab.is-focused .exlab-side {
+  opacity: 0.35;
+  transition: opacity 0.4s ease;
+}
+
+@media (max-width: 1024px) {
+  .exlab-side {
+    display: none;
+  }
+
+  .exlab-brand {
+    left: 0.75rem;
+    top: 0.85rem;
+    font-size: 0.85rem;
+  }
+
+  .exlab-chrome-top {
+    justify-content: flex-end;
+    padding-right: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exlab.is-side-on .exlab-side-word {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .exlab-sound-dot {
+    transition: none;
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@scenelapse/exhibition-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portable SceneLapse Creative Space / Exhibition Lab (Three.js orbit wall)",
+  "main": "src/index.js",
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "three": ">=0.160.0"
+  },
+  "files": [
+    "src",
+    "public",
+    "README.md"
+  ],
+  "keywords": [
+    "exhibition",
+    "three.js",
+    "photobooth",
+    "creative-space"
+  ]
+}

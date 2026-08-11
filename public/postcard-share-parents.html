@@ -17,10 +17,10 @@
 <link rel="stylesheet" href="/assets/postcard-card-CqVokCik.css">
 <link rel="stylesheet" href="/assets/mobile-responsive-Dfoc304p.css">
 <link rel="stylesheet" href="/assets/scrapbook-photo.css">
-<link rel="stylesheet" href="/assets/parents-share.css">
+<link rel="stylesheet" href="/assets/parents-share.css?v=10">
 <script src="/assets/firebase-config.js"></script>
 <script type="module" src="/assets/firebase-postcard.js?v=3"></script>
-<script type="module" src="/assets/parents-share.js"></script>
+<script type="module" src="/assets/parents-share.js?v=11"></script>
 </head>
 <body>
 <div class="share-sheet frame-sheet" id="shareSheet" aria-hidden="true">
@@ -94,31 +94,50 @@
 
   <div class="parents-letter" id="parentsLetter" hidden>
     <article class="parents-letter__card">
-      <h2 class="parents-letter__title">💙 ถึงผู้ปกครองทุกท่าน เนื่องในโอกาสวันแม่แห่งชาติ</h2>
-      <p>
-        ม.หวังว่า <strong>สิ่งเล็ก ๆ น้อย ๆ ที่นักเรียนได้ตั้งใจทำในวันนี้</strong>
-        จะช่วยเติมเต็มรอยยิ้ม สร้างความสุข และเป็นพลังใจดี ๆ ให้กับผู้ปกครองทุกท่าน
-        ก่อนที่จะกลับไปทำงานและทำหน้าที่ในแต่ละวันครับ
-      </p>
-      <p>
-        วันนี้ลูก ๆ ทุกคนได้แสดงออกถึง <strong>ความรัก ความตั้งใจ และความใส่ใจ</strong>
-        ผ่านสิ่งที่พวกเขาตั้งใจทำให้กับครอบครัวอย่างเต็มที่
-        ม.รู้สึกดีใจและภูมิใจที่ได้เห็นความตั้งใจของนักเรียนทุกคนครับ
-      </p>
-      <p>
-        แม้จะเป็นเพียงสิ่งเล็ก ๆ แต่ ม.เชื่อว่า
-        <strong>ความรักและความตั้งใจของลูก ๆ มีคุณค่ามากกว่าสิ่งของใด ๆ</strong>
-        และหวังว่าจะเป็นอีกหนึ่งความทรงจำดี ๆ ที่ผู้ปกครองและนักเรียนจะเก็บไว้ร่วมกันครับ
-      </p>
-      <p>
-        ขอให้คุณแม่และผู้ปกครองทุกท่านมีความสุข สุขภาพแข็งแรง
-        และได้รับพลังใจดี ๆ จากลูก ๆ ในทุก ๆ วันนะครับ 🙏🏻💙
-      </p>
-      <p class="parents-letter__sign">ม.บอล</p>
-      <div class="parents-letter__progress" aria-hidden="true">
-        <div class="parents-letter__progress-fill" id="parentsLetterProgress"></div>
+      <div class="parents-letter__stage">
+        <img
+          class="parents-letter__bg"
+          id="parentsLetterBg"
+          alt=""
+          aria-hidden="true"
+        >
+        <div class="parents-letter__body">
+          <h2 class="parents-letter__title">💙 ถึงผู้ปกครองทุกท่าน<br>เนื่องในโอกาสวันแม่แห่งชาติ</h2>
+          <p>
+            ม.หวังว่า <strong>สิ่งเล็ก ๆ น้อย ๆ ที่นักเรียนได้ตั้งใจทำในวันนี้</strong>
+            จะช่วยเติมเต็มรอยยิ้ม สร้างความสุข และเป็นพลังใจดี ๆ ให้กับผู้ปกครองทุกท่าน
+            ก่อนที่จะกลับไปทำงานและทำหน้าที่ในแต่ละวันครับ
+          </p>
+          <p>
+            วันนี้ลูก ๆ ทุกคนได้แสดงออกถึง <strong>ความรัก ความตั้งใจ และความใส่ใจ</strong>
+            ผ่านสิ่งที่พวกเขาตั้งใจทำให้กับครอบครัวอย่างเต็มที่
+            ม.รู้สึกดีใจและภูมิใจที่ได้เห็นความตั้งใจของนักเรียนทุกคนครับ
+          </p>
+          <p>
+            แม้จะเป็นเพียงสิ่งเล็ก ๆ แต่ ม.เชื่อว่า
+            <strong>ความรักและความตั้งใจของลูก ๆ มีคุณค่ามากกว่าสิ่งของใด ๆ</strong>
+            และหวังว่าจะเป็นอีกหนึ่งความทรงจำดี ๆ ที่ผู้ปกครองและนักเรียนจะเก็บไว้ร่วมกันครับ
+          </p>
+          <p>
+            ขอให้คุณแม่และผู้ปกครองทุกท่านมีความสุข สุขภาพแข็งแรง
+            และได้รับพลังใจดี ๆ จากลูก ๆ ในทุก ๆ วันนะครับ 🙏🏻💙
+          </p>
+          <p class="parents-letter__sign">ม.บอล</p>
+          <div class="parents-letter__progress" aria-hidden="true">
+            <div class="parents-letter__progress-fill" id="parentsLetterProgress"></div>
+          </div>
+        </div>
       </div>
     </article>
+  </div>
+
+  <div class="parents-exhibition" id="parentsExhibition" hidden>
+    <iframe
+      class="parents-exhibition__frame"
+      id="parentsExhibitionFrame"
+      title="Exhibition"
+      allow="autoplay"
+    ></iframe>
   </div>
 </div>
 

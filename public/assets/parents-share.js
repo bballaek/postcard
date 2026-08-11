@@ -19,6 +19,12 @@ const envelope = document.getElementById("parentsEnvelope");
 const flipBtn = document.getElementById("parentsFlipBtn");
 const letter = document.getElementById("parentsLetter");
 const letterProgress = document.getElementById("parentsLetterProgress");
+const letterBg = document.getElementById("parentsLetterBg");
+const letterBody = letter
+  ? letter.querySelector(".parents-letter__body")
+  : null;
+const exhibition = document.getElementById("parentsExhibition");
+const exhibitionFrame = document.getElementById("parentsExhibitionFrame");
 const lightbox = document.getElementById("parentsLightbox");
 const lightboxImg = document.getElementById("parentsLightboxImg");
 const lightboxClose = document.getElementById("parentsLightboxClose");
@@ -26,7 +32,8 @@ const lightboxX = document.getElementById("parentsLightboxX");
 
 const OTP_LEN = 5;
 const FLIP_MS = 550;
-const LETTER_MS = 15000;
+const TYPE_MS = 58;
+const LETTER_HOLD_MS = 4200;
 const SUBMIT_LABEL = submit ? submit.textContent : "View card";
 const ENVELOPES = {
   modern: "/assets/welcome/modern/envelope.png",
@@ -51,6 +58,7 @@ let flipping = false;
 let frontUrl = "";
 let backUrl = "";
 let scrapbookPhotoUrl = "";
+let letterPhotoUrl = "";
 let stageReady = false;
 
 function onlyDigit(value) {
@@ -129,16 +137,22 @@ function fitStage() {
 function showSearch() {
   if (!page) return;
   page.classList.add("is-search");
-  page.classList.remove("is-result", "is-loading", "is-letter");
+  page.classList.remove("is-result", "is-loading", "is-letter", "is-exhibition");
   if (search) {
     search.hidden = false;
     search.removeAttribute("hidden");
     search.classList.remove("is-leaving");
   }
+  if (exhibition) {
+    exhibition.hidden = true;
+    exhibition.classList.remove("is-visible");
+  }
+  if (exhibitionFrame) exhibitionFrame.removeAttribute("src");
   if (letter) {
     letter.hidden = true;
     letter.classList.remove("is-visible");
   }
+  if (letterBg) letterBg.removeAttribute("src");
   if (cardSlot) {
     cardSlot.hidden = true;
     cardSlot.classList.remove("is-visible");
@@ -153,6 +167,7 @@ function showSearch() {
   frontUrl = "";
   backUrl = "";
   scrapbookPhotoUrl = "";
+  letterPhotoUrl = "";
   stageReady = true;
   fitStage();
 }
@@ -168,6 +183,145 @@ async function hideSearch() {
   search.hidden = true;
 }
 
+function normalizeLetterSpace(text) {
+  return String(text || "").replace(/\s+/g, " ").trim();
+}
+
+function captureLetterScript() {
+  if (!letterBody || letterBody.dataset.scriptReady === "1") return;
+  const nodes = letterBody.querySelectorAll(
+    ".parents-letter__title, p:not(.parents-letter__sign), .parents-letter__sign",
+  );
+  nodes.forEach((el) => {
+    el.dataset.typeHtml = el.innerHTML;
+  });
+  letterBody.dataset.scriptReady = "1";
+}
+
+function countTypeChars(html) {
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html;
+  return normalizeLetterSpace(tmp.textContent).length;
+}
+
+function setLetterProgress(ratio) {
+  if (!letterProgress) return;
+  letterProgress.style.width = `${Math.max(0, Math.min(1, ratio)) * 100}%`;
+}
+
+async function typeInto(el, html, onChar) {
+  const source = document.createElement("div");
+  source.innerHTML = html;
+  el.innerHTML = "";
+  el.classList.add("is-typing");
+
+  const nodes = Array.from(source.childNodes);
+  for (const node of nodes) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent || "";
+      for (const ch of text) {
+        if (ch === "\n") continue;
+        el.appendChild(document.createTextNode(ch));
+        if (typeof onChar === "function") onChar(ch);
+        if (!/\s/.test(ch)) await wait(TYPE_MS);
+        else await wait(TYPE_MS * 0.35);
+      }
+      continue;
+    }
+
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const tag = node.tagName.toLowerCase();
+      if (tag === "br") {
+        el.appendChild(document.createElement("br"));
+        continue;
+      }
+      if (tag === "strong" || tag === "em" || tag === "b" || tag === "i") {
+        const wrap = document.createElement(tag);
+        el.appendChild(wrap);
+        const text = normalizeLetterSpace(node.textContent);
+        for (const ch of text) {
+          wrap.appendChild(document.createTextNode(ch));
+          if (typeof onChar === "function") onChar(ch);
+          await wait(TYPE_MS);
+        }
+        continue;
+      }
+      el.appendChild(node.cloneNode(true));
+    }
+  }
+
+  el.classList.remove("is-typing");
+}
+
+async function playLetterTypewriter() {
+  captureLetterScript();
+  if (!letterBody) return;
+
+  const targets = Array.from(
+    letterBody.querySelectorAll(
+      ".parents-letter__title, p:not(.parents-letter__sign), .parents-letter__sign",
+    ),
+  );
+  const totalChars = targets.reduce(
+    (sum, el) => sum + countTypeChars(el.dataset.typeHtml || ""),
+    0,
+  );
+  let typed = 0;
+
+  targets.forEach((el) => {
+    el.innerHTML = "";
+    el.classList.remove("is-typed");
+  });
+  setLetterProgress(0);
+
+  for (const el of targets) {
+    const html = el.dataset.typeHtml || "";
+    await typeInto(el, html, () => {
+      typed += 1;
+      if (totalChars > 0) setLetterProgress(typed / totalChars);
+    });
+    el.classList.add("is-typed");
+    await wait(420);
+  }
+
+  setLetterProgress(1);
+  await wait(LETTER_HOLD_MS);
+}
+
+async function showExhibition() {
+  if (!page || !exhibition || !exhibitionFrame) return;
+
+  if (search && !search.hidden) {
+    await hideSearch();
+  }
+
+  page.classList.remove("is-search", "is-result", "is-loading", "is-letter");
+  page.classList.add("is-exhibition");
+
+  exhibition.hidden = false;
+  exhibition.removeAttribute("hidden");
+  void exhibition.offsetWidth;
+  exhibition.classList.add("is-visible");
+  exhibitionFrame.src = "/parents-exhibition";
+
+  await new Promise((resolve) => {
+    function onMessage(event) {
+      if (event.origin !== window.location.origin) return;
+      const data = event.data;
+      if (!data || data.type !== "parents-exhibition-next") return;
+      window.removeEventListener("message", onMessage);
+      resolve();
+    }
+    window.addEventListener("message", onMessage);
+  });
+
+  exhibition.classList.remove("is-visible");
+  await wait(280);
+  exhibition.hidden = true;
+  exhibitionFrame.removeAttribute("src");
+  page.classList.remove("is-exhibition");
+}
+
 async function showLetter() {
   if (!page || !letter) return;
 
@@ -175,41 +329,20 @@ async function showLetter() {
     await hideSearch();
   }
 
-  page.classList.remove("is-search", "is-result", "is-loading");
+  page.classList.remove("is-search", "is-result", "is-loading", "is-exhibition");
   page.classList.add("is-letter");
+
+  if (letterBg) {
+    letterBg.src = "/assets/3.png";
+  }
 
   letter.hidden = false;
   letter.removeAttribute("hidden");
-  if (letterProgress) letterProgress.style.width = "0%";
+  setLetterProgress(0);
   void letter.offsetWidth;
   letter.classList.add("is-visible");
 
-  await new Promise((resolve) => {
-    let done = false;
-    const started = performance.now();
-    let raf = 0;
-
-    function finish() {
-      if (done) return;
-      done = true;
-      if (raf) cancelAnimationFrame(raf);
-      resolve();
-    }
-
-    function tick(now) {
-      if (done) return;
-      const elapsed = now - started;
-      const ratio = Math.min(1, elapsed / LETTER_MS);
-      if (letterProgress) letterProgress.style.width = `${ratio * 100}%`;
-      if (elapsed >= LETTER_MS) {
-        finish();
-        return;
-      }
-      raf = requestAnimationFrame(tick);
-    }
-
-    raf = requestAnimationFrame(tick);
-  });
+  await playLetterTypewriter();
 
   letter.classList.remove("is-visible");
   await wait(350);
@@ -220,9 +353,10 @@ async function showLetter() {
 async function showResult() {
   if (!page) return;
 
+  await showExhibition();
   await showLetter();
 
-  page.classList.remove("is-search", "is-loading", "is-letter");
+  page.classList.remove("is-search", "is-loading", "is-letter", "is-exhibition");
   page.classList.add("is-result");
 
   if (cardSlot) {
@@ -315,6 +449,10 @@ async function renderCard(style, data) {
   scrapbookPhotoUrl =
     (data && data.stickers && data.stickers[0]) ||
     (data && data.backPhoto) ||
+    "";
+  letterPhotoUrl =
+    scrapbookPhotoUrl ||
+    (data && data.photo) ||
     "";
   if (frontImg) {
     frontImg.removeAttribute("src");
