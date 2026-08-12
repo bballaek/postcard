@@ -1,4 +1,5 @@
 import "/assets/postcard-card-Dn_Hk0Aw.js";
+import { playBloom, preloadBloom } from "/assets/parents-bloom.js?v=3";
 
 const page = document.getElementById("parentsPage");
 const stageWrap = document.getElementById("shareStageWrap");
@@ -25,6 +26,9 @@ const letterBody = letter
   : null;
 const exhibition = document.getElementById("parentsExhibition");
 const exhibitionFrame = document.getElementById("parentsExhibitionFrame");
+const bloomRoot = document.getElementById("parentsBloom");
+const bloomCanvas = document.getElementById("parentsBloomCanvas");
+const bloomVeil = document.getElementById("parentsBloomVeil");
 const lightbox = document.getElementById("parentsLightbox");
 const lightboxImg = document.getElementById("parentsLightboxImg");
 const lightboxClose = document.getElementById("parentsLightboxClose");
@@ -143,11 +147,8 @@ function showSearch() {
     search.removeAttribute("hidden");
     search.classList.remove("is-leaving");
   }
-  if (exhibition) {
-    exhibition.hidden = true;
-    exhibition.classList.remove("is-visible");
-  }
-  if (exhibitionFrame) exhibitionFrame.removeAttribute("src");
+  hideExhibition(true);
+  hideBloom();
   if (letter) {
     letter.hidden = true;
     letter.classList.remove("is-visible");
@@ -320,6 +321,7 @@ async function showExhibition() {
   void exhibition.offsetWidth;
   exhibition.classList.add("is-visible");
   exhibitionFrame.src = "/parents-exhibition";
+  void preloadBloom();
 
   const result = await new Promise((resolve) => {
     function onMessage(event) {
@@ -334,12 +336,67 @@ async function showExhibition() {
     window.addEventListener("message", onMessage);
   });
 
-  exhibition.classList.remove("is-visible");
-  await wait(280);
-  exhibition.hidden = true;
-  exhibitionFrame.removeAttribute("src");
-  page.classList.remove("is-exhibition");
   return result;
+}
+
+function hideExhibition(immediate) {
+  if (!exhibition) return;
+  exhibition.classList.remove("is-visible");
+  if (immediate) {
+    exhibition.hidden = true;
+    if (exhibitionFrame) exhibitionFrame.removeAttribute("src");
+    if (page) page.classList.remove("is-exhibition");
+    return;
+  }
+  window.setTimeout(() => {
+    exhibition.hidden = true;
+    if (exhibitionFrame) exhibitionFrame.removeAttribute("src");
+    if (page) page.classList.remove("is-exhibition");
+  }, 280);
+}
+
+function hideBloom() {
+  if (!bloomRoot) return;
+  bloomRoot.hidden = true;
+  bloomRoot.classList.remove("is-playing");
+  bloomRoot.setAttribute("aria-hidden", "true");
+  if (bloomVeil) bloomVeil.style.opacity = "0";
+}
+
+async function playBloomReveal() {
+  if (!bloomRoot || !bloomCanvas) {
+    hideExhibition();
+    await revealCard();
+    return;
+  }
+
+  bloomRoot.hidden = false;
+  bloomRoot.removeAttribute("hidden");
+  bloomRoot.classList.add("is-playing");
+  bloomRoot.setAttribute("aria-hidden", "false");
+  if (bloomVeil) bloomVeil.style.opacity = "0";
+
+  let revealStarted = false;
+  async function revealUnderFlowers() {
+    if (revealStarted) return;
+    revealStarted = true;
+    hideExhibition();
+    await revealCard();
+  }
+
+  try {
+    await playBloom({
+      canvas: bloomCanvas,
+      veil: bloomVeil,
+      onCovered: () => {
+        void revealUnderFlowers();
+      },
+    });
+  } catch (err) {
+    console.error(err);
+  }
+  if (!revealStarted) await revealUnderFlowers();
+  hideBloom();
 }
 
 async function showLetter() {
@@ -418,8 +475,7 @@ async function showResult() {
 
   await showExhibition();
   // Teacher letter step hidden for this event.
-  // Always show the card for the student ID entered at search.
-  await revealCard();
+  await playBloomReveal();
 }
 
 async function lookupStudent(rawId) {
